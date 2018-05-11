@@ -24,7 +24,7 @@ Note: the -L option and -lstdc++ may not be needed on some machines.
  */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-
+#include <unistd.h> // needed for sleep
 using namespace std;
  
 /*
@@ -35,6 +35,7 @@ const int BufferSize = 10;
 int FPS = 30;
 const int width = 800;
 const int height = 600;
+int hit_pause = 0;
 
 /*
  * Information to draw on the window.
@@ -48,7 +49,6 @@ struct XInfo {
 	int		height;
 };
 
-
 /*
  * Function to put out a message on error exits.
  */
@@ -56,7 +56,6 @@ void error( string str ) {
   cerr << str << endl;
   exit(0);
 }
-
 
 /*
  * An abstract class representing displayable things. 
@@ -83,7 +82,8 @@ class Snake : public Displayable {
 		}
 		
 		void move(XInfo &xinfo) {
-			cerr << "direction = " << direction << endl;
+			if (hit_pause != 0 && (hit_pause % 2)) {return;}
+
 			trun();
 			if (dir == 0) {
 				x = x + direction;
@@ -105,7 +105,7 @@ class Snake : public Displayable {
 				if (y < 0 || y > height) {
 					direction = -direction;
 				}
-		}
+			}
 
             // ** ADD YOUR LOGIC **
             // Here, you will be performing collision detection between the snake, 
@@ -183,11 +183,22 @@ class Fruit : public Displayable {
         int y;
 };
 
+class Edge : public Displayable {
+	public:
+		virtual void paint(XInfo& xinfo) {
+			XPoint points[] = {{0, 0}, {800, 0}, {800, 600}, {0, 600}, {0,0}};
+			int npoints = sizeof(points) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points, npoints, CoordModeOrigin);
+		}
+
+		// constructor
+		Edge() {}
+};
 
 list<Displayable *> dList;           // list of Displayables
 Snake snake(100, 450, 0, 0);
 Fruit fruit;
-
+Edge edge;
 
 /*
  * Initialize X and create a window
@@ -259,6 +270,15 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XSetLineAttributes(xInfo.display, xInfo.gc[i],
 	                     1, LineSolid, CapButt, JoinRound);
 
+	i = 1;
+	xInfo.gc[i] = XCreateGC(xInfo.display, xInfo.window, 0, 0);
+	XSetForeground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
+	XSetBackground(xInfo.display, xInfo.gc[i], WhitePixel(xInfo.display, xInfo.screen));
+	XSetFillStyle(xInfo.display, xInfo.gc[i], FillSolid);
+	XSetLineAttributes(xInfo.display, xInfo.gc[i],
+	                   7, LineSolid, CapRound, JoinMiter);
+
+
 	XSelectInput(xInfo.display, xInfo.window, 
 		ButtonPressMask | KeyPressMask | 
 		PointerMotionMask | 
@@ -270,6 +290,9 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	 */
 	XMapRaised( xInfo.display, xInfo.window );
 	XFlush(xInfo.display);
+
+	// give server time to setup before sending drawing commands
+	sleep(1);
 }
 
 /*
@@ -321,10 +344,9 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 			case 'Q':
 				error("Terminating normally.");
 				break;
-			case 'p':
+			case 'p': //pause
 			case 'P':
-				//pause
-				cerr << "received pause" << endl;
+				hit_pause++;
 				break;
 			case 'r':
 			case 'R':
@@ -379,13 +401,14 @@ unsigned long now() {
 void eventLoop(XInfo &xinfo) {
 	// Add stuff to paint to the display list
 	dList.push_front(&snake);
-    dList.push_front(&fruit);
+	dList.push_front(&fruit);
+	dList.push_front(&edge);
 	
 	XEvent event;
 	unsigned long lastRepaint = 0;
 	int inside = 0;
 
-	while( true ) {
+	while(true) {
 		/*
 		 * This is NOT a performant event loop!  
 		 * It needs help!
@@ -407,7 +430,6 @@ void eventLoop(XInfo &xinfo) {
 			}
 		}
 
-		cerr << "FPS = " << FPS  << endl;
 		usleep(1000000/FPS);
 		handleAnimation(xinfo, inside);
 		repaint(xinfo);
