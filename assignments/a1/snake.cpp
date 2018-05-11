@@ -73,32 +73,13 @@ class Snake : public Displayable {
 		}
 
 		void trun () {
-			switch(dir) {
-				case 0: // right
-					if (receive == 1 || receive == 3) {
-						dir = receive;
-						direction = abs(direction);
-					}
-					break;
-				case 1: // down
-					if (receive == 2 || receive == 0) {
-						dir = receive;
-						direction = abs(direction);
-					}
-					break;
-				case 2: // left
-					if (receive == 1 || receive == 3) {
-						dir = receive;
-						direction = abs(direction);
-					}
-					break;
-				case 3: //up
-					if (receive == 0 || receive == 2) {
-						dir = receive;
-						direction = abs(direction);
-					}
-					break;
-				}
+			if ((dir == 0 && (receive == 1 || receive == 3)) || 
+				(dir == 1 && (receive == 2 || receive == 0)) || 
+				(dir == 2 && (receive == 1 || receive == 3)) ||
+				(dir == 3 && (receive == 0 || receive == 2))) {
+				dir = receive;
+				direction = abs(direction);
+			}
 		}
 		
 		void move(XInfo &xinfo) {
@@ -212,6 +193,10 @@ Fruit fruit;
  * Initialize X and create a window
  */
 void initX(int argc, char *argv[], XInfo &xInfo) {
+	//command line input
+	if (argc == 2 && atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60){
+		FPS = atoi(argv[1]);
+	}
 	if (argc == 3 && 
 		atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60 &&
 		atoi(argv[2]) >= 1 && atoi(argv[2]) <= 10) {
