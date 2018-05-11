@@ -32,7 +32,7 @@ using namespace std;
  */
 const int Border = 1;
 const int BufferSize = 10;
-const int FPS = 30;
+int FPS = 30;
 const int width = 800;
 const int height = 600;
 
@@ -102,6 +102,7 @@ class Snake : public Displayable {
 		}
 		
 		void move(XInfo &xinfo) {
+			cerr << "direction = " << direction << endl;
 			trun();
 			if (dir == 0) {
 				x = x + direction;
@@ -157,12 +158,16 @@ class Snake : public Displayable {
 		
 		Snake(int x, int y, int dir, int receive): x(x), y(y), dir(dir), receive(receive) {
 			direction = 5;
-            blockSize = 10;
+			blockSize = 10;
 		}
 
 		void change_keyboard(int re) {
 			receive = re;
 			cerr << receive<< endl;
+		}
+
+		void set_direction(int argv_II){
+			direction = argv_II;
 		}
 	
 	private:
@@ -207,6 +212,13 @@ Fruit fruit;
  * Initialize X and create a window
  */
 void initX(int argc, char *argv[], XInfo &xInfo) {
+	if (argc == 3 && 
+		atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60 &&
+		atoi(argv[2]) >= 1 && atoi(argv[2]) <= 10) {
+		FPS = atoi(argv[1]);
+		snake.set_direction(atoi(argv[2]));
+	}
+
 	XSizeHints hints;
 	unsigned long white, black;
 
@@ -408,8 +420,9 @@ void eventLoop(XInfo &xinfo) {
 					inside = 0;
 					break;
 			}
-		} 
+		}
 
+		cerr << "FPS = " << FPS  << endl;
 		usleep(1000000/FPS);
 		handleAnimation(xinfo, inside);
 		repaint(xinfo);
