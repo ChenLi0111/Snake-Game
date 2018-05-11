@@ -71,12 +71,59 @@ class Snake : public Displayable {
 		virtual void paint(XInfo &xinfo) {
 			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 25, blockSize);
 		}
+
+		void trun () {
+			switch(dir) {
+				case 0: // right
+					if (receive == 1 || receive == 3) {
+						dir = receive;
+						direction = abs(direction);
+					}
+					break;
+				case 1: // down
+					if (receive == 2 || receive == 0) {
+						dir = receive;
+						direction = abs(direction);
+					}
+					break;
+				case 2: // left
+					if (receive == 1 || receive == 3) {
+						dir = receive;
+						direction = abs(direction);
+					}
+					break;
+				case 3: //up
+					if (receive == 0 || receive == 2) {
+						dir = receive;
+						direction = abs(direction);
+					}
+					break;
+				}
+		}
 		
 		void move(XInfo &xinfo) {
-			x = x + direction;
-			if (x < 0 || x > width) {
-				direction = -direction;
-			}
+			trun();
+			if (dir == 0) {
+				x = x + direction;
+				if (x < 0 || x > width) {
+					direction = -direction;
+				}
+			} else if (dir == 1) {
+				y = y + direction;
+				if (y < 0 || y > height) {
+					direction = -direction;
+				}
+			} else if (dir == 2) {
+				x = x - direction;
+				if (x < 0 || x > width) {
+					direction = -direction;
+				}
+			} else if (dir == 3) {
+				y = y - direction;
+				if (y < 0 || y > height) {
+					direction = -direction;
+				}
+		}
 
             // ** ADD YOUR LOGIC **
             // Here, you will be performing collision detection between the snake, 
@@ -108,9 +155,14 @@ class Snake : public Displayable {
         void turnRight() {
         }
 		
-		Snake(int x, int y): x(x), y(y) {
+		Snake(int x, int y, int dir, int receive): x(x), y(y), dir(dir), receive(receive) {
 			direction = 5;
             blockSize = 10;
+		}
+
+		void change_keyboard(int re) {
+			receive = re;
+			cerr << receive<< endl;
 		}
 	
 	private:
@@ -118,6 +170,8 @@ class Snake : public Displayable {
 		int y;
 		int blockSize;
 		int direction;
+		int dir; // 0 right; 1 down; 2 left; 3 up
+		int receive; // 0 d; 1 s; 2 a; 3 w
 };
 
 class Fruit : public Displayable {
@@ -145,7 +199,7 @@ class Fruit : public Displayable {
 
 
 list<Displayable *> dList;           // list of Displayables
-Snake snake(100, 450);
+Snake snake(100, 450, 0, 0);
 Fruit fruit;
 
 
@@ -160,9 +214,9 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	* Display opening uses the DISPLAY	environment variable.
 	* It can go wrong if DISPLAY isn't set, or you don't have permission.
 	*/	
-	xInfo.display = XOpenDisplay( "" );
-	if ( !xInfo.display )	{
-		error( "Can't open display." );
+	xInfo.display = XOpenDisplay("");
+	if (!xInfo.display) {
+		error("Can't open display.");
 	}
 	
    /*
@@ -262,18 +316,58 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 		BufferSize, 			// size of the text buffer
 		&key, 					// workstation-independent key symbol
 		NULL );					// pointer to a composeStatus structure (unused)
-	if ( i == 1) {
+	if (i == 1) {
 		printf("Got key press -- %c\n", text[0]);
-		if (text[0] == 'q') {
-			error("Terminating normally.");
+
+		switch(text[0]) {
+			case 'q':
+			case 'Q':
+				error("Terminating normally.");
+				break;
+			case 'p':
+			case 'P':
+				//pause
+				cerr << "received pause" << endl;
+				break;
+			case 'r':
+			case 'R':
+				//restart
+				cerr << "received restart" << endl; 
+				break;
+			case 'w':
+			case 'W':
+				//go upward
+				cerr << "go upward" << endl;
+				snake.change_keyboard(3);
+				break;
+			case 'a':
+			case 'A':
+				//left
+				cerr << "left" << endl;
+				snake.change_keyboard(2);
+				break;
+			case 's':
+			case 'S':
+				//go downward
+				cerr << "go downward" << endl;
+				snake.change_keyboard(1);
+				break;
+			case 'd':
+			case 'D':
+				//right
+				cerr << "right" << endl;
+				snake.change_keyboard(0);
+				break;
 		}
+
 	}
 }
 
 void handleAnimation(XInfo &xinfo, int inside) {
     /*
      * ADD YOUR OWN LOGIC
-     * This method handles animation for different objects on the screen and readies the next frame before the screen is re-painted.
+     * This method handles animation for different objects on the screen 
+     * and readies the next frame before the screen is re-painted.
      */ 
 	snake.move(xinfo);
 }
@@ -302,7 +396,7 @@ void eventLoop(XInfo &xinfo) {
 		
 		if (XPending(xinfo.display) > 0) {
 			XNextEvent( xinfo.display, &event );
-			cout << "event.type=" << event.type << "\n";
+			//cout << "event.type=" << event.type << "\n";
 			switch( event.type ) {
 				case KeyPress:
 					handleKeyPress(xinfo, event);
