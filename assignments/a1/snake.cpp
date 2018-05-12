@@ -55,7 +55,7 @@ struct XInfo {
 /*
  * Function to put out a message on error exits.
  */
-void error( string str ) {
+void error(string str) {
   cerr << str << endl;
   exit(0);
 }
@@ -71,7 +71,7 @@ class Displayable {
 class Snake : public Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) {
-			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 25, blockSize);
+			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 10, blockSize);
 		}
 
 		void trun () {
@@ -91,22 +91,22 @@ class Snake : public Displayable {
 			trun();
 			if (dir == 0) {
 				x = x + direction;
-				if (x < 0 || x > width) {
+				if (x < 0 || x > width - 10) {
 					direction = -direction;
 				}
 			} else if (dir == 1) {
 				y = y + direction;
-				if (y < 0 || y > height) {
+				if (y < 60 || y > height) {
 					direction = -direction;
 				}
 			} else if (dir == 2) {
 				x = x - direction;
-				if (x < 0 || x > width) {
+				if (x < 10 || x > width) {
 					direction = -direction;
 				}
 			} else if (dir == 3) {
 				y = y - direction;
-				if (y < 0 || y > height) {
+				if (y < 60 || y > height) {
 					direction = -direction;
 				}
 			}
@@ -128,19 +128,12 @@ class Snake : public Displayable {
          * ** ADD YOUR LOGIC **
          * Use these placeholder methods as guidance for implementing the snake behaviour. 
          * You do not have to use these methods, feel free to implement your own.
-         */ 
-        void didEatFruit() {
+         */
+		void didEatFruit() {
         }
 
-        void didHitObstacle() {
-        }
+        void didHitObstacle() {}
 
-        void turnLeft() {
-        }
-
-        void turnRight() {
-        }
-		
 		Snake(int x, int y, int dir, int receive): x(x), y(y), dir(dir), receive(receive) {
 			direction = speed;
 			blockSize = 10;
@@ -242,7 +235,7 @@ class Text : public Displayable {
 		string s;
 };
 
-list<Displayable *> dList;           // list of Displayables
+list<Displayable *> dList; // list of Displayables
 Snake snake(100, 450, 0, 0);
 Fruit fruit;
 Edge edge;
@@ -262,7 +255,7 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 		atoi(argv[2]) >= 1 && atoi(argv[2]) <= 10) {
 		FPS = atoi(argv[1]);
 		speed = atoi(argv[2]);
-		snake.set_direction(speed);
+		snake.set_direction(atoi(argv[2]));
 		text_line.set_print_FPS(atoi(argv[1]));
 		text_line.set_print_direction(atoi(argv[2]));
 	}
@@ -462,9 +455,9 @@ void eventLoop(XInfo &xinfo) {
 		 */
 		
 		if (XPending(xinfo.display) > 0) {
-			XNextEvent( xinfo.display, &event );
+			XNextEvent(xinfo.display, &event);
 			//cout << "event.type=" << event.type << "\n";
-			switch( event.type ) {
+			switch(event.type) {
 				case KeyPress:
 					handleKeyPress(xinfo, event);
 					break;
@@ -491,7 +484,7 @@ void eventLoop(XInfo &xinfo) {
  *	 Next loop responding to events.
  *	 Exit forcing window manager to clean up - cheesy, but easy.
  */
-int main ( int argc, char *argv[] ) {
+int main (int argc, char *argv[]) {
 	XInfo xInfo;
 
 	initX(argc, argv, xInfo);
