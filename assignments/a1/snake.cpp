@@ -250,14 +250,14 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 		FPS = atoi(argv[1]);
 		text_line.set_print_FPS(atoi(argv[1]));
 	}
-	if (argc == 3 && 
-		atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60 &&
-		atoi(argv[2]) >= 1 && atoi(argv[2]) <= 10) {
+	if (argc == 3 && atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60) {
 		FPS = atoi(argv[1]);
-		speed = atoi(argv[2]);
-		snake.set_direction(atoi(argv[2]));
 		text_line.set_print_FPS(atoi(argv[1]));
-		text_line.set_print_direction(atoi(argv[2]));
+		if (atoi(argv[2]) >= 1 && atoi(argv[2]) <= 10) {
+			speed = atoi(argv[2]);
+			snake.set_direction(atoi(argv[2]));
+			text_line.set_print_direction(atoi(argv[2]));
+		}
 	}
 
 	XSizeHints hints;
