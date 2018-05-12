@@ -18,6 +18,8 @@ Note: the -L option and -lstdc++ may not be needed on some machines.
 #include <math.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string>
+#include <sstream>
 
 /*
  * Header files for X functions
@@ -33,6 +35,7 @@ using namespace std;
 const int Border = 1;
 const int BufferSize = 10;
 int FPS = 30;
+int speed = 5;
 const int width = 800;
 const int height = 600;
 int hit_pause = 0;
@@ -82,6 +85,7 @@ class Snake : public Displayable {
 		}
 		
 		void move(XInfo &xinfo) {
+			//cerr << direction << endl;
 			if (hit_pause != 0 && (hit_pause % 2)) {return;}
 
 			trun();
@@ -138,19 +142,18 @@ class Snake : public Displayable {
         }
 		
 		Snake(int x, int y, int dir, int receive): x(x), y(y), dir(dir), receive(receive) {
-			direction = 5;
+			direction = speed;
 			blockSize = 10;
 		}
 
 		void change_keyboard(int re) {
 			receive = re;
-			cerr << receive<< endl;
 		}
 
-		void set_direction(int argv_II){
-			direction = argv_II;
+		void set_direction(int argv_2) {
+			direction = argv_2;
 		}
-	
+
 	private:
 		int x;
 		int y;
@@ -189,16 +192,61 @@ class Edge : public Displayable {
 			XPoint points[] = {{0, 0}, {800, 0}, {800, 600}, {0, 600}, {0,0}};
 			int npoints = sizeof(points) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points, npoints, CoordModeOrigin);
+
+			XPoint points_2[] = {{0, 50}, {800, 50}};
+			int npoints_2 = sizeof(points_2) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_2, npoints_2, CoordModeOrigin);
 		}
 
 		// constructor
 		Edge() {}
 };
 
+class Text : public Displayable {
+	public:
+		virtual void paint(XInfo& xinfo) {
+			ostringstream stream_1, stream_2;
+			stream_1 << print_Speed;
+			stream_2 << print_FPS;
+			s = "";
+			s.append("Score: ");
+			s.append(" FPS: ");
+			s.append(stream_2.str());
+			s.append(" Speed: ");
+			s.append(stream_1.str());
+
+			XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[1], 
+				x, y, s.c_str(), s.length());
+		}
+
+		// constructor
+		Text(int x, int y): x(x), y(y) {
+			s = "";
+			print_Speed = 5;
+			print_FPS = 30;
+		}
+
+		void set_print_direction(int d){
+			print_Speed = d;
+		}
+
+		void set_print_FPS(int F){
+			print_FPS = F;
+		}
+
+	private:
+		int x;
+		int y;
+		int print_Speed;
+		int print_FPS;
+		string s;
+};
+
 list<Displayable *> dList;           // list of Displayables
 Snake snake(100, 450, 0, 0);
 Fruit fruit;
 Edge edge;
+Text text_line(25, 30);
 
 /*
  * Initialize X and create a window
@@ -207,12 +255,16 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	//command line input
 	if (argc == 2 && atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60){
 		FPS = atoi(argv[1]);
+		text_line.set_print_FPS(atoi(argv[1]));
 	}
 	if (argc == 3 && 
 		atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60 &&
 		atoi(argv[2]) >= 1 && atoi(argv[2]) <= 10) {
 		FPS = atoi(argv[1]);
-		snake.set_direction(atoi(argv[2]));
+		speed = atoi(argv[2]);
+		snake.set_direction(speed);
+		text_line.set_print_FPS(atoi(argv[1]));
+		text_line.set_print_direction(atoi(argv[2]));
 	}
 
 	XSizeHints hints;
@@ -277,6 +329,10 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XSetFillStyle(xInfo.display, xInfo.gc[i], FillSolid);
 	XSetLineAttributes(xInfo.display, xInfo.gc[i],
 	                   7, LineSolid, CapRound, JoinMiter);
+	// load a larger font
+	XFontStruct * font;
+	font = XLoadQueryFont (xInfo.display, "12x24");
+	XSetFont (xInfo.display, xInfo.gc[i], font->fid);
 
 
 	XSelectInput(xInfo.display, xInfo.window, 
@@ -338,7 +394,6 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 		NULL );					// pointer to a composeStatus structure (unused)
 	if (i == 1) {
 		printf("Got key press -- %c\n", text[0]);
-
 		switch(text[0]) {
 			case 'q':
 			case 'Q':
@@ -348,33 +403,24 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 			case 'P':
 				hit_pause++;
 				break;
-			case 'r':
+			case 'r': //restart
 			case 'R':
-				//restart
 				cerr << "received restart" << endl; 
 				break;
 			case 'w':
 			case 'W':
-				//go upward
-				cerr << "go upward" << endl;
 				snake.change_keyboard(3);
 				break;
 			case 'a':
 			case 'A':
-				//left
-				cerr << "left" << endl;
 				snake.change_keyboard(2);
 				break;
 			case 's':
 			case 'S':
-				//go downward
-				cerr << "go downward" << endl;
 				snake.change_keyboard(1);
 				break;
 			case 'd':
 			case 'D':
-				//right
-				cerr << "right" << endl;
 				snake.change_keyboard(0);
 				break;
 		}
@@ -403,6 +449,7 @@ void eventLoop(XInfo &xinfo) {
 	dList.push_front(&snake);
 	dList.push_front(&fruit);
 	dList.push_front(&edge);
+	dList.push_front(&text_line);
 	
 	XEvent event;
 	unsigned long lastRepaint = 0;
@@ -430,6 +477,7 @@ void eventLoop(XInfo &xinfo) {
 			}
 		}
 
+		//cerr << FPS << endl;
 		usleep(1000000/FPS);
 		handleAnimation(xinfo, inside);
 		repaint(xinfo);
