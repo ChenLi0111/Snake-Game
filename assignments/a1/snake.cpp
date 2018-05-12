@@ -39,6 +39,9 @@ int speed = 5;
 const int width = 800;
 const int height = 600;
 int hit_pause = 0;
+int fruit_x = 150;
+int fruit_y = 150;
+int eat_fruit = 0;
 
 /*
  * Information to draw on the window.
@@ -67,6 +70,39 @@ class Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) = 0;
 };       
+
+class Fruit : public Displayable {
+	public:
+		virtual void paint(XInfo &xinfo) {
+			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 10, 10);
+        }
+		
+		Fruit() {
+		// ** ADD YOUR LOGIC **
+		// generate the x and y value for the fruit
+			x = 5;
+			y = 55;
+		}
+		
+		void re_generate(){
+			x = (rand() % 78 + 1) * 10;
+			y = (rand() % 54 + 6) * 10;
+			cerr << "fruit x = " << x << " y = " << y << endl;
+			fruit_x = x;
+			fruit_y = y;
+        }
+
+        // ** ADD YOUR LOGIC **
+        /*
+         * The fruit needs to be re-generated at new location every time a snake eats it. See the assignment webpage for more details.
+         */
+
+    private:
+        int x;
+        int y;
+};
+
+Fruit fruit;
 
 class Snake : public Displayable {
 	public:
@@ -111,9 +147,16 @@ class Snake : public Displayable {
 				}
 			}
 
-            // ** ADD YOUR LOGIC **
-            // Here, you will be performing collision detection between the snake, 
-            // the fruit, and the obstacles depending on what the snake lands on.
+			cerr << "snake x = " << x << " y = " << y << endl;
+
+			if ((x == (fruit_x - 5) && y == fruit_y) || 
+				(x == fruit_x && y == (fruit_y - 5))) {
+				eat_fruit++;
+				fruit.re_generate();
+			}
+			// ** ADD YOUR LOGIC **
+			// Here, you will be performing collision detection between the snake, 
+			// the fruit, and the obstacles depending on what the snake lands on.
 		}
 		
 		int getX() {
@@ -124,11 +167,9 @@ class Snake : public Displayable {
 			return y;
 		}
 
-        /*
-         * ** ADD YOUR LOGIC **
-         * Use these placeholder methods as guidance for implementing the snake behaviour. 
-         * You do not have to use these methods, feel free to implement your own.
-         */
+		 /* ** ADD YOUR LOGIC **
+		 * Use these placeholder methods as guidance for implementing the snake behaviour.
+		 * You do not have to use these methods, feel free to implement your own.*/
 		void didEatFruit() {
         }
 
@@ -154,29 +195,6 @@ class Snake : public Displayable {
 		int direction;
 		int dir; // 0 right; 1 down; 2 left; 3 up
 		int receive; // 0 d; 1 s; 2 a; 3 w
-};
-
-class Fruit : public Displayable {
-	public:
-		virtual void paint(XInfo &xinfo) {
-			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 10, 10);
-        }
-
-        Fruit() {
-            // ** ADD YOUR LOGIC **
-            // generate the x and y value for the fruit 
-            x = 50;
-            y = 50;
-        }
-
-        // ** ADD YOUR LOGIC **
-        /*
-         * The fruit needs to be re-generated at new location every time a snake eats it. See the assignment webpage for more details.
-         */
-
-    private:
-        int x;
-        int y;
 };
 
 class Edge : public Displayable {
@@ -237,7 +255,7 @@ class Text : public Displayable {
 
 list<Displayable *> dList; // list of Displayables
 Snake snake(100, 450, 0, 0);
-Fruit fruit;
+
 Edge edge;
 Text text_line(25, 30);
 
