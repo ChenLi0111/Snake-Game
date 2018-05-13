@@ -85,9 +85,9 @@ class Fruit : public Displayable {
 		}
 		
 		void re_generate(){
-			x = (rand() % 78 + 1) * 10;
-			y = (rand() % 54 + 6) * 10;
-			cerr << "fruit x = " << x << " y = " << y << endl;
+			x = rand() % 780 + 10;
+			y = rand() % 540 + 60;
+			//cerr << "fruit x = " << x << " y = " << y << endl;
 			fruit_x = x;
 			fruit_y = y;
         }
@@ -146,7 +146,7 @@ class Snake : public Displayable {
 				}
 			}
 
-			cerr << "snake x = " << x << " y = " << y << endl;
+			//cerr << "snake x = " << x << " y = " << y << endl;
 
 			if ((x == (fruit_x - 5) && y == fruit_y) || 
 				(x == fruit_x && y == (fruit_y - 5))) {
@@ -207,9 +207,6 @@ class Edge : public Displayable {
 			int npoints_2 = sizeof(points_2) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_2, npoints_2, CoordModeOrigin);
 		}
-
-		// constructor
-		Edge() {}
 };
 
 class Text : public Displayable {
@@ -337,8 +334,8 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XSetForeground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
 	XSetBackground(xInfo.display, xInfo.gc[i], WhitePixel(xInfo.display, xInfo.screen));
 	XSetFillStyle(xInfo.display, xInfo.gc[i], FillSolid);
-	XSetLineAttributes(xInfo.display, xInfo.gc[i],
-	                   7, LineSolid, CapRound, JoinMiter);
+	XSetLineAttributes(xInfo.display, xInfo.gc[i], 7, // 7 is line width
+						 LineSolid, CapRound, JoinMiter); // other line options
 	// load a larger font
 	XFontStruct * font;
 	font = XLoadQueryFont (xInfo.display, "12x24");
@@ -402,6 +399,7 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 		BufferSize, 			// size of the text buffer
 		&key, 					// workstation-independent key symbol
 		NULL );					// pointer to a composeStatus structure (unused)
+	//cerr <<  event.xkey.keycode << endl;
 	if (i == 1) {
 		printf("Got key press -- %c\n", text[0]);
 		switch(text[0]) {
@@ -433,17 +431,31 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 			case 'D':
 				snake.change_keyboard(0);
 				break;
-		}
 
+		}
+	}
+	switch(event.xkey.keycode){
+			case 134: //up
+				snake.change_keyboard(3);
+				break;
+			case 131: //left
+				snake.change_keyboard(2);
+				break;
+			case 133: //down
+				snake.change_keyboard(1);
+				break;
+			case 132: //right
+				snake.change_keyboard(0);
+				break;
 	}
 }
 
 void handleAnimation(XInfo &xinfo, int inside) {
-    /*
-     * ADD YOUR OWN LOGIC
-     * This method handles animation for different objects on the screen 
-     * and readies the next frame before the screen is re-painted.
-     */ 
+	/*
+	 * ADD YOUR OWN LOGIC
+	 * This method handles animation for different objects on the screen 
+	 * and readies the next frame before the screen is re-painted.
+	 */
 	snake.move(xinfo);
 }
 
