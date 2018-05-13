@@ -355,7 +355,7 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XFlush(xInfo.display);
 
 	// give server time to setup before sending drawing commands
-	sleep(1);
+	//sleep(1);
 }
 
 /*
@@ -499,10 +499,22 @@ void eventLoop(XInfo &xinfo) {
 			}
 		}
 
+		unsigned long end = now();
+		if (end - lastRepaint > 1000000 / FPS) {
+			handleAnimation(xinfo, inside);
+			repaint(xinfo);
+			lastRepaint = now();
+		}
+
+		// IMPORTANT: sleep for a bit to let other processes work
+		if (XPending(xinfo.display) == 0) {
+			usleep(1000000 / FPS - (end - lastRepaint));
+		}
+
 		//cerr << FPS << endl;
-		usleep(1000000/FPS);
-		handleAnimation(xinfo, inside);
-		repaint(xinfo);
+		//usleep(1000000/FPS);
+		//handleAnimation(xinfo, inside);
+		//repaint(xinfo);
 	}
 }
 
