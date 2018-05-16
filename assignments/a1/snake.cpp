@@ -60,8 +60,8 @@ struct XInfo {
  * Function to put out a message on error exits.
  */
 void error(string str) {
-  cerr << str << endl;
-  exit(0);
+	cerr << str << endl;
+	exit(0);
 }
 
 /*
@@ -120,7 +120,6 @@ class Snake : public Displayable {
 				(dir == 3 && (receive == 0 || receive == 2))) {
 				dir = receive;
 				received_turn = true;
-				cerr << "here" << endl;
 			}
 		}
 
@@ -428,8 +427,7 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 		text, 					// buffer when text will be written
 		BufferSize, 			// size of the text buffer
 		&key, 					// workstation-independent key symbol
-		NULL );					// pointer to a composeStatus structure (unused)
-	//cerr <<  event.xkey.keycode << endl;
+		NULL);					// pointer to a composeStatus structure (unused)
 	if (i == 1) {
 		printf("Got key press -- %c\n", text[0]);
 		switch(text[0]) {
