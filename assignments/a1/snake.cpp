@@ -70,7 +70,7 @@ void error(string str) {
 class Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) = 0;
-};       
+};
 
 class Fruit : public Displayable {
 	public:
@@ -86,10 +86,8 @@ class Fruit : public Displayable {
 		}
 		
 		void re_generate(){
-			//x [5, 785]
-			//y [55, 585]
-			x = (rand() % 78) * 10 + 5;
-			y = (rand() % 53) * 10 + 55;
+			x = (rand() % 78) * 10 + 5; //x [5, 785]
+			y = (rand() % 53) * 10 + 55; //y [55, 585]
 			fruit_x = x;
 			fruit_y = y;
         }
@@ -459,7 +457,6 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 			case 'D':
 				snake.change_keyboard(0);
 				break;
-
 		}
 	}
 	switch(event.xkey.keycode){
@@ -546,7 +543,6 @@ void eventLoop(XInfo &xinfo) {
 	}
 }
 
-
 /*
  * Start executing here.
  *	 First initialize window.
@@ -555,7 +551,6 @@ void eventLoop(XInfo &xinfo) {
  */
 int main (int argc, char *argv[]) {
 	XInfo xInfo;
-
 	initX(argc, argv, xInfo);
 	eventLoop(xInfo);
 	XCloseDisplay(xInfo.display);
