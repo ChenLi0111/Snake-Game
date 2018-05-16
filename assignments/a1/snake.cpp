@@ -20,6 +20,7 @@ Note: the -L option and -lstdc++ may not be needed on some machines.
 #include <unistd.h>
 #include <string>
 #include <sstream>
+#include <vector>
 
 /*
  * Header files for X functions
@@ -39,8 +40,8 @@ int speed = 5;
 const int width = 800;
 const int height = 600;
 int hit_pause = 0;
-int fruit_x = 150;
-int fruit_y = 150;
+int fruit_x = 305;
+int fruit_y = 455;
 int eat_fruit = 0;
 
 /*
@@ -80,16 +81,18 @@ class Fruit : public Displayable {
 		Fruit() {
 		// ** ADD YOUR LOGIC **
 		// generate the x and y value for the fruit
-			x = 5;
-			y = 55;
+			x = 305;
+			y = 455;
 		}
 		
 		void re_generate(){
-			x = rand() % 780 + 10;
-			y = rand() % 540 + 60;
-			//cerr << "fruit x = " << x << " y = " << y << endl;
+			//x [5, 785]
+			//y [55, 585]
+			x = (rand() % 78) * 10 + 5;
+			y = (rand() % 53) * 10 + 55;
 			fruit_x = x;
 			fruit_y = y;
+			cerr << "fruit x = " << x << " y = " << y << endl;
         }
 
         // ** ADD YOUR LOGIC **
@@ -106,7 +109,10 @@ Fruit fruit;
 class Snake : public Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) {
-			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 10, blockSize);
+			//XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 10, blockSize);
+			for (vector<pair<int, int> >::iterator it = block_list.begin(); it != block_list.end(); ++it) {
+				XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], (*it).first, (*it).second, 10, blockSize);
+			}
 		}
 
 		void trun () {
@@ -115,85 +121,94 @@ class Snake : public Displayable {
 				(dir == 2 && (receive == 1 || receive == 3)) ||
 				(dir == 3 && (receive == 0 || receive == 2))) {
 				dir = receive;
-				direction = abs(direction);
+				received_turn = true;
+				cerr << "here" << endl;
 			}
 		}
 		
-		void move(XInfo &xinfo) {
-			//cerr << direction << endl;
+		void move(XInfo &xinfo) { // need changes
+			//x [5, 785]
+			//y [55, 585]
 			if (hit_pause != 0 && (hit_pause % 2)) {return;}
+			if (received_turn != true) {trun();}
 
-			trun();
-			if (dir == 0) {
-				x = x + direction;
-				if (x < 0 || x > width - 10) {
-					direction = -direction;
+			if (wait < 10 - speed) {
+				wait++;
+				return;
+			} else {
+				if (dir == 0) {
+					for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
+						(*it).first = (*(it + 1)).first;
+						(*it).second = (*(it + 1)).second;
+					}
+					block_list.front().first += 10;
+				} else if (dir == 1) {
+					for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
+						(*it).first = (*(it + 1)).first;
+						(*it).second = (*(it + 1)).second;
+					}
+					block_list.front().second += 10;
+				} else if (dir == 2) {
+					for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
+						(*it).first = (*(it + 1)).first;
+						(*it).second = (*(it + 1)).second;
+					}
+					block_list.front().first -= 10;
+				} else if (dir == 3) {
+					for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
+						(*it).first = (*(it + 1)).first;
+						(*it).second = (*(it + 1)).second;
+					}
+					block_list.front().second -= 10;
 				}
-			} else if (dir == 1) {
-				y = y + direction;
-				if (y < 60 || y > height) {
-					direction = -direction;
-				}
-			} else if (dir == 2) {
-				x = x - direction;
-				if (x < 10 || x > width) {
-					direction = -direction;
-				}
-			} else if (dir == 3) {
-				y = y - direction;
-				if (y < 60 || y > height) {
-					direction = -direction;
-				}
+				didEatFruit();
+				wait = 0;
 			}
-
-			//cerr << "snake x = " << x << " y = " << y << endl;
-
-			if ((x == (fruit_x - 5) && y == fruit_y) || 
-				(x == fruit_x && y == (fruit_y - 5))) {
-				eat_fruit++;
-				fruit.re_generate();
-			}
+			received_turn = false;
 			// ** ADD YOUR LOGIC **
 			// Here, you will be performing collision detection between the snake, 
 			// the fruit, and the obstacles depending on what the snake lands on.
-		}
-		
-		int getX() {
-			return x;
-		}
-		
-		int getY() {
-			return y;
 		}
 
 		 /* ** ADD YOUR LOGIC **
 		 * Use these placeholder methods as guidance for implementing the snake behaviour.
 		 * You do not have to use these methods, feel free to implement your own.*/
-		void didEatFruit() {
+		void didEatFruit() { // need predict
+	/*		if ((x == (fruit_x - 10) && y == fruit_y) || 
+				(x == fruit_x && y == (fruit_y - 10))) {
+				eat_fruit++;
+				fruit.re_generate();
+			} */
         }
 
         void didHitObstacle() {}
 
-		Snake(int x, int y, int dir, int receive): x(x), y(y), dir(dir), receive(receive) {
-			direction = speed;
+		Snake(int dir, int receive): dir(dir), receive(receive) {
 			blockSize = 10;
+			wait = 0;
+			received_turn = false;
+			int x_1 = 105;
+			int x_2 = 95;
+			int x_3 = 85;
+			int y_1 = 255;
+			int y_2 = 255;
+			int y_3 = 255;
+			block_list.push_back(make_pair(x_1, y_2));
+			block_list.push_back(make_pair(x_2, y_2));
+			block_list.push_back(make_pair(x_3, y_3));
 		}
 
 		void change_keyboard(int re) {
 			receive = re;
 		}
 
-		void set_direction(int argv_2) {
-			direction = argv_2;
-		}
-
 	private:
-		int x;
-		int y;
 		int blockSize;
-		int direction;
 		int dir; // 0 right; 1 down; 2 left; 3 up
 		int receive; // 0 d; 1 s; 2 a; 3 w
+		int wait;
+		bool received_turn;
+		std::vector< pair<int, int> > block_list;
 };
 
 class Edge : public Displayable {
@@ -250,7 +265,7 @@ class Text : public Displayable {
 };
 
 list<Displayable *> dList; // list of Displayables
-Snake snake(100, 450, 0, 0);
+Snake snake(0, 0);
 
 Edge edge;
 Text text_line(25, 30);
@@ -269,7 +284,6 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 		text_line.set_print_FPS(atoi(argv[1]));
 		if (atoi(argv[2]) >= 1 && atoi(argv[2]) <= 10) {
 			speed = atoi(argv[2]);
-			snake.set_direction(atoi(argv[2]));
 			text_line.set_print_direction(atoi(argv[2]));
 		}
 	}
@@ -334,7 +348,7 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XSetForeground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
 	XSetBackground(xInfo.display, xInfo.gc[i], WhitePixel(xInfo.display, xInfo.screen));
 	XSetFillStyle(xInfo.display, xInfo.gc[i], FillSolid);
-	XSetLineAttributes(xInfo.display, xInfo.gc[i], 7, // 7 is line width
+	XSetLineAttributes(xInfo.display, xInfo.gc[i], 10, // 5 is line width
 						 LineSolid, CapRound, JoinMiter); // other line options
 	// load a larger font
 	XFontStruct * font;
