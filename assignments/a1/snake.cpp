@@ -92,7 +92,6 @@ class Fruit : public Displayable {
 			y = (rand() % 53) * 10 + 55;
 			fruit_x = x;
 			fruit_y = y;
-			cerr << "fruit x = " << x << " y = " << y << endl;
         }
 
         // ** ADD YOUR LOGIC **
@@ -109,7 +108,6 @@ Fruit fruit;
 class Snake : public Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) {
-			//XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 10, blockSize);
 			for (vector<pair<int, int> >::iterator it = block_list.begin(); it != block_list.end(); ++it) {
 				XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], (*it).first, (*it).second, 10, blockSize);
 			}
@@ -125,8 +123,15 @@ class Snake : public Displayable {
 				cerr << "here" << endl;
 			}
 		}
+
+		void update_list() {
+			for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
+						(*it).first = (*(it + 1)).first;
+						(*it).second = (*(it + 1)).second;
+			}
+		}
 		
-		void move(XInfo &xinfo) { // need changes
+		void move(XInfo &xinfo) {
 			//x [5, 785]
 			//y [55, 585]
 			if (hit_pause != 0 && (hit_pause % 2)) {return;}
@@ -136,32 +141,7 @@ class Snake : public Displayable {
 				wait++;
 				return;
 			} else {
-				if (dir == 0) {
-					for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
-						(*it).first = (*(it + 1)).first;
-						(*it).second = (*(it + 1)).second;
-					}
-					block_list.front().first += 10;
-				} else if (dir == 1) {
-					for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
-						(*it).first = (*(it + 1)).first;
-						(*it).second = (*(it + 1)).second;
-					}
-					block_list.front().second += 10;
-				} else if (dir == 2) {
-					for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
-						(*it).first = (*(it + 1)).first;
-						(*it).second = (*(it + 1)).second;
-					}
-					block_list.front().first -= 10;
-				} else if (dir == 3) {
-					for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
-						(*it).first = (*(it + 1)).first;
-						(*it).second = (*(it + 1)).second;
-					}
-					block_list.front().second -= 10;
-				}
-				didEatFruit();
+				didEatFruit(dir);
 				wait = 0;
 			}
 			received_turn = false;
@@ -173,12 +153,46 @@ class Snake : public Displayable {
 		 /* ** ADD YOUR LOGIC **
 		 * Use these placeholder methods as guidance for implementing the snake behaviour.
 		 * You do not have to use these methods, feel free to implement your own.*/
-		void didEatFruit() { // need predict
-	/*		if ((x == (fruit_x - 10) && y == fruit_y) || 
-				(x == fruit_x && y == (fruit_y - 10))) {
-				eat_fruit++;
-				fruit.re_generate();
-			} */
+		void eat_add() {
+			block_list.insert(block_list.begin(), make_pair(fruit_x, fruit_y));
+			eat_fruit++;
+			fruit.re_generate();
+		}
+
+		void didEatFruit(int where) {
+			if (where == 0) {
+				if (block_list.front().first + 10 == fruit_x && 
+					block_list.front().second == fruit_y) {
+					eat_add();
+				} else {
+					update_list();
+					block_list.front().first += 10;
+				}	
+			} else if (where == 1) {
+				if (block_list.front().first == fruit_x && 
+					block_list.front().second + 10 == fruit_y) {
+					eat_add();
+				} else {
+					update_list();
+					block_list.front().second += 10;
+				}
+			} else if (where == 2) {
+				if (block_list.front().first - 10 == fruit_x && 
+					block_list.front().second == fruit_y) {
+					eat_add();
+				} else {
+					update_list();
+					block_list.front().first -= 10;
+				}
+			} else if (where == 3) {
+				if (block_list.front().first == fruit_x && 
+					block_list.front().second - 10 == fruit_y) {
+					eat_add();
+				} else {
+					update_list();
+					block_list.front().second -= 10;
+				}
+			}
         }
 
         void didHitObstacle() {}
@@ -227,11 +241,13 @@ class Edge : public Displayable {
 class Text : public Displayable {
 	public:
 		virtual void paint(XInfo& xinfo) {
-			ostringstream stream_1, stream_2;
+			ostringstream stream_1, stream_2, stream_3;
 			stream_1 << print_Speed;
 			stream_2 << print_FPS;
+			stream_3 << eat_fruit;
 			s = "";
 			s.append("Score: ");
+			s.append(stream_3.str());
 			s.append(" FPS: ");
 			s.append(stream_2.str());
 			s.append(" Speed: ");
