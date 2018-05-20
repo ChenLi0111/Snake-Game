@@ -52,12 +52,12 @@ bool end_game = false;
  * Information to draw on the window.
  */
 struct XInfo {
-	Display	 *display;
-	int		 screen;
-	Window	 window;
-	GC		 gc[3];
-	int		width;		// size of window
-	int		height;
+	Display *display;
+	int screen;
+	Window window;
+	GC gc[3];
+	int width;		// size of window
+	int height;
 };
 
 /*
@@ -517,16 +517,14 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XSetForeground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
 	XSetBackground(xInfo.display, xInfo.gc[i], WhitePixel(xInfo.display, xInfo.screen));
 	XSetFillStyle(xInfo.display, xInfo.gc[i], FillSolid);
-	XSetLineAttributes(xInfo.display, xInfo.gc[i],
-	                     1, LineSolid, CapButt, JoinRound);
+	XSetLineAttributes(xInfo.display, xInfo.gc[i], 1, LineSolid, CapButt, JoinRound);
 
 	i = 1;
 	xInfo.gc[i] = XCreateGC(xInfo.display, xInfo.window, 0, 0);
 	XSetForeground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
 	XSetBackground(xInfo.display, xInfo.gc[i], WhitePixel(xInfo.display, xInfo.screen));
 	XSetFillStyle(xInfo.display, xInfo.gc[i], FillSolid);
-	XSetLineAttributes(xInfo.display, xInfo.gc[i], 10, // 10 is line width
-						 LineSolid, CapRound, JoinMiter); // other line options
+	XSetLineAttributes(xInfo.display, xInfo.gc[i], 10, LineSolid, CapButt, JoinBevel); // other line options
 	// load a larger font
 	XFontStruct * font;
 	font = XLoadQueryFont (xInfo.display, "12x24");
