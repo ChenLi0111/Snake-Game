@@ -46,6 +46,7 @@ int eat_fruit = 0;
 bool press_restart_fruit = false;
 bool press_restart_snake = false;
 bool press_restart_score = false;
+bool start_game = true;
 bool end_game = false;
 
 /*
@@ -115,25 +116,71 @@ class Fruit : public Displayable {
 
 Fruit fruit;
 
+class Start_Display : public Displayable {
+	public:
+		virtual void paint(XInfo& xinfo) {
+			if (start_game == true) {
+				XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], 0, 0, 800, 600);
+
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 100, s_1.c_str(), s_1.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 200, s_2.c_str(), s_2.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 250, s_3.c_str(), s_3.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 300, s_4.c_str(), s_4.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 350, s_5.c_str(), s_5.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 400, s_6.c_str(), s_6.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 450, s_7.c_str(), s_7.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 500, s_8.c_str(), s_8.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 550, s_9.c_str(), s_9.length());
+			}
+		}
+
+	    Start_Display() {
+			s_1 = "First name: Chen, Last name: Li, student ID: 20597755.";
+			s_2 = "Welcome to this snake game.";
+			s_3 = "Please press k/K to start the game.";
+			s_4 = "Use w/a/s/d or arrows keys to control";
+			s_5 = " the direction of the snake.";
+			s_6 = "Use r/R to restart.";
+			s_7 = "Use p/P to pause.";
+			s_8 = "Use q/Q to quit the game.";
+			s_9 = "Good luck and have fun!";
+		}
+	private:
+		string s_1;
+		string s_2;
+		string s_3;
+		string s_4;
+		string s_5;
+		string s_6;
+		string s_7;
+		string s_8;
+		string s_9;
+};
+
+Start_Display start_display;
+
 class End_Display : public Displayable {
 	public:
 		virtual void paint(XInfo& xinfo) {
 			if (end_game == true) {
+				XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], 0, 0, 800, 600);
 				ostringstream stream_4;
 				stream_4 << eat_fruit;
-				s = "";
-				s.append("Score: ");
-				s.append(stream_4.str());
-				s.append(". Press r/R to restart.");
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 
-					x, y, s.c_str(), s.length());
+				string temp = "Score: ";
+				temp.append(stream_4.str());
+				string ss = "Press r/R to restart.";
+				string sss = "Press q/Q to quit.";
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], x, y, s.c_str(), s.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], x, y + 50, temp.c_str(), temp.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], x, y + 100, ss.c_str(), ss.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], x, y + 150, sss.c_str(), sss.length());
 			}
 		}
 
 		End_Display() {
-			x = 210;
-			y = 290;
-			s = "";
+			x = 250;
+			y = 250;
+			s = "Game Over!";
 		}
 	private:
 		string s;
@@ -189,7 +236,7 @@ class Snake : public Displayable {
 		void move(XInfo &xinfo) {
 			//x [5, 785]
 			//y [55, 585]
-			if ((hit_pause != 0 && (hit_pause % 2)) || (end_game == true)) {return;}
+			if ((hit_pause != 0 && (hit_pause % 2)) || (end_game == true) || (start_game == true)) {return;}
 			if (received_turn != true) {trun();}
 
 			if (wait < 10 - speed) {
@@ -559,7 +606,7 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 /*
  * Function to repaint a display list
  */
-void repaint( XInfo &xinfo) {
+void repaint(XInfo &xinfo) {
 	list<Displayable *>::const_iterator begin = dList.begin();
 	list<Displayable *>::const_iterator end = dList.end();
 
@@ -630,6 +677,10 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 			case 'D':
 				snake.change_keyboard(0);
 				break;
+			case 'k':
+			case 'K':
+				start_game = false;
+				break;
 		}
 	}
 	switch(event.xkey.keycode){
@@ -667,6 +718,7 @@ unsigned long now() {
 
 void eventLoop(XInfo &xinfo) {
 	// Add stuff to paint to the display list
+	dList.push_front(&start_display);
 	dList.push_front(&end_display);
 	dList.push_front(&edge);
 	dList.push_front(&fruit);
