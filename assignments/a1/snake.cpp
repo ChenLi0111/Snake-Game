@@ -57,7 +57,7 @@ struct XInfo {
 	int screen;
 	Window window;
 	GC gc[3];
-	int width;		// size of window
+	int width; // size of window
 	int height;
 };
 
@@ -92,8 +92,6 @@ class Fruit : public Displayable {
 		}
 		
 		Fruit() {
-		// ** ADD YOUR LOGIC **
-		// generate the x and y value for the fruit
 			x = 305;
 			y = 455;
 		}
@@ -105,10 +103,6 @@ class Fruit : public Displayable {
 			fruit_y = y;
         }
 
-        // ** ADD YOUR LOGIC **
-        /*
-         * The fruit needs to be re-generated at new location every time a snake eats it. See the assignment webpage for more details.
-         */
 	private:
 		int x;
 		int y;
@@ -247,7 +241,6 @@ class Snake : public Displayable {
 				didHitObstacle(dir);
 				didEatFruit(dir);
 				wait = 0;
-				//cerr << "x = " << (block_list[0]).first << " y = " << (block_list[0]).second << endl;
 			}
 			received_turn = false;
 			// ** ADD YOUR LOGIC **
@@ -255,9 +248,6 @@ class Snake : public Displayable {
 			// the fruit, and the obstacles depending on what the snake lands on.
 		}
 
-		 /* ** ADD YOUR LOGIC **
-		 * Use these placeholder methods as guidance for implementing the snake behaviour.
-		 * You do not have to use these methods, feel free to implement your own.*/
 		bool check_regenerate() {
 			//left block   [55, 465]  [65, 485]
 			//middle block [195, 255] [635, 285]
@@ -465,7 +455,6 @@ class Text : public Displayable {
 				x, y, s.c_str(), s.length());
 		}
 
-		// constructor
 		Text(int x, int y): x(x), y(y) {
 			s = "";
 			print_Speed = 5;
@@ -571,7 +560,7 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XSetForeground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
 	XSetBackground(xInfo.display, xInfo.gc[i], WhitePixel(xInfo.display, xInfo.screen));
 	XSetFillStyle(xInfo.display, xInfo.gc[i], FillSolid);
-	XSetLineAttributes(xInfo.display, xInfo.gc[i], 10, LineSolid, CapButt, JoinBevel); // other line options
+	XSetLineAttributes(xInfo.display, xInfo.gc[i], 10, LineSolid, CapButt, JoinBevel);
 	// load a larger font
 	XFontStruct * font;
 	font = XLoadQueryFont (xInfo.display, "12x24");
@@ -598,9 +587,6 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	 */
 	XMapRaised( xInfo.display, xInfo.window );
 	XFlush(xInfo.display);
-
-	// give server time to setup before sending drawing commands
-	//sleep(1);
 }
 
 /*
@@ -705,7 +691,6 @@ void handleAnimation(XInfo &xinfo, int inside) {
 	 * This method handles animation for different objects on the screen 
 	 * and readies the next frame before the screen is re-painted.
 	 */
-
 	snake.move(xinfo);
 }
 
