@@ -46,6 +46,7 @@ int eat_fruit = 0;
 bool press_restart_fruit = false;
 bool press_restart_snake = false;
 bool press_restart_score = false;
+bool end_game = false;
 
 /*
  * Information to draw on the window.
@@ -84,6 +85,7 @@ class Fruit : public Displayable {
 				fruit_x = x;
 				fruit_y = y;
 				press_restart_fruit = false;
+				end_game = false;
 			}
 			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 10, 10);
 		}
@@ -112,6 +114,35 @@ class Fruit : public Displayable {
 };
 
 Fruit fruit;
+
+
+class End_Display : public Displayable {
+	public:
+		virtual void paint(XInfo& xinfo) {
+			if (end_game == true) {
+				ostringstream stream_4;
+				stream_4 << eat_fruit;
+				s = "";
+				s.append("Score: ");
+				s.append(stream_4.str());
+				s.append(". Press r/R to restart.");
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[1], 
+					x, y, s.c_str(), s.length());
+			}
+		}
+
+		End_Display() {
+			x = 210;
+			y = 290;
+			s = "";
+		}
+	private:
+		string s;
+		int x;
+		int y;
+};
+
+End_Display end_display;
 
 class Snake : public Displayable {
 	public:
@@ -166,6 +197,8 @@ class Snake : public Displayable {
 				wait++;
 				return;
 			} else {
+				if (didHitObstacle(dir)) {return;}
+				didHitObstacle(dir);
 				didEatFruit(dir);
 				wait = 0;
 			}
@@ -229,9 +262,20 @@ class Snake : public Displayable {
 					block_list.front().second -= 10;
 				}
 			}
-        }
+		}
 
-        void didHitObstacle() {}
+		bool didHitObstacle(int where) {
+			//x [5, 785]
+			//y [55, 585]
+			if ((where == 0 && block_list.front().first >= 785) ||
+				(where == 1 && block_list.front().second >= 585) ||
+				(where == 2 && block_list.front().first <= 5) ||
+				(where == 3 && block_list.front().second <= 55)) {
+				end_game = true;
+				return true;
+			}
+			return false;
+        }
 
 		Snake(int dir, int receive): dir(dir), receive(receive) {
 			blockSize = 10;
@@ -526,6 +570,7 @@ void handleAnimation(XInfo &xinfo, int inside) {
 	 * This method handles animation for different objects on the screen 
 	 * and readies the next frame before the screen is re-painted.
 	 */
+
 	snake.move(xinfo);
 }
 
@@ -538,10 +583,11 @@ unsigned long now() {
 
 void eventLoop(XInfo &xinfo) {
 	// Add stuff to paint to the display list
-	dList.push_front(&snake);
-	dList.push_front(&fruit);
 	dList.push_front(&edge);
+	dList.push_front(&fruit);
+	dList.push_front(&snake);
 	dList.push_front(&text_line);
+	dList.push_front(&end_display);
 	
 	XEvent event;
 	unsigned long lastRepaint = 0;
