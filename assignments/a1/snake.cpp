@@ -189,7 +189,7 @@ class Snake : public Displayable {
 		void move(XInfo &xinfo) {
 			//x [5, 785]
 			//y [55, 585]
-			if (hit_pause != 0 && (hit_pause % 2)) {return;}
+			if ((hit_pause != 0 && (hit_pause % 2)) || (end_game == true)) {return;}
 			if (received_turn != true) {trun();}
 
 			if (wait < 10 - speed) {
