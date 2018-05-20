@@ -274,6 +274,7 @@ class Snake : public Displayable {
 		}
 
 		bool didHitObstacle(int where) {
+			//hit edges
 			//x [5, 785]
 			//y [55, 585]
 			if ((where == 0 && block_list.front().first >= 785) ||
@@ -284,6 +285,7 @@ class Snake : public Displayable {
 				return true;
 			}
 
+			//hit a block
 			//left block   [55, 465]  [65, 485]
 			//middle block [195, 255] [635, 285]
 			//right block  [655, 95]  [715, 125]
@@ -311,6 +313,37 @@ class Snake : public Displayable {
 				 (block_list.front().first >= 655 && block_list.front().first <= 715 && block_list.front().second == 135))) {
 				end_game = true;
 				return true;
+			}
+
+			//hit itself
+			if (where == 0) {
+				for (vector<pair<int, int> >::iterator it = block_list.begin() + 1; it != block_list.end(); ++it) {
+					if ((block_list.front().first + 10 == (*it).first) && (block_list.front().second == (*it).second)) {
+						end_game = true;
+						return true;
+					}
+				}
+			} else if (where == 1) {
+				for (vector<pair<int, int> >::iterator it = block_list.begin() + 1; it != block_list.end(); ++it) {
+					if ((block_list.front().first == (*it).first) && (block_list.front().second + 10 == (*it).second)) {
+						end_game = true;
+						return true;
+					}
+				}
+			} else if (where == 2) {
+				for (vector<pair<int, int> >::iterator it = block_list.begin() + 1; it != block_list.end(); ++it) {
+					if ((block_list.front().first - 10 == (*it).first) && (block_list.front().second == (*it).second)) {
+						end_game = true;
+						return true;
+					}
+				}
+			} else if (where == 3) {
+				for (vector<pair<int, int> >::iterator it = block_list.begin() + 1; it != block_list.end(); ++it) {
+					if ((block_list.front().first == (*it).first) && (block_list.front().second - 10 == (*it).second)) {
+						end_game = true;
+						return true;
+					}
+				}
 			}
 			return false;
 		}
