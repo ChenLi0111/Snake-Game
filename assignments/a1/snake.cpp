@@ -115,7 +115,6 @@ class Fruit : public Displayable {
 
 Fruit fruit;
 
-
 class End_Display : public Displayable {
 	public:
 		virtual void paint(XInfo& xinfo) {
@@ -126,7 +125,7 @@ class End_Display : public Displayable {
 				s.append("Score: ");
 				s.append(stream_4.str());
 				s.append(". Press r/R to restart.");
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[1], 
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 
 					x, y, s.c_str(), s.length());
 			}
 		}
@@ -201,6 +200,7 @@ class Snake : public Displayable {
 				didHitObstacle(dir);
 				didEatFruit(dir);
 				wait = 0;
+				//cerr << "x = " << (block_list[0]).first << " y = " << (block_list[0]).second << endl;
 			}
 			received_turn = false;
 			// ** ADD YOUR LOGIC **
@@ -212,6 +212,15 @@ class Snake : public Displayable {
 		 * Use these placeholder methods as guidance for implementing the snake behaviour.
 		 * You do not have to use these methods, feel free to implement your own.*/
 		bool check_regenerate() {
+			//left block   [55, 465]  [65, 485]
+			//middle block [195, 255] [635, 285]
+			//right block  [655, 95]  [715, 125]
+			if ((fruit_x >= 55 && fruit_x <= 65 && fruit_y >= 465 && fruit_y <= 485) ||
+				(fruit_x >= 195 && fruit_x <= 635 && fruit_y >= 255 && fruit_y <= 285) ||
+				(fruit_x >= 655 && fruit_x <= 715 && fruit_y >= 95 && fruit_y <= 125)) {
+				return true;
+			}
+
 			for (vector<pair<int, int> >::iterator it = block_list.begin(); it != block_list.end(); ++it) {
 				if (fruit_x == (*it).first && fruit_y == (*it).second) {
 					return true;
@@ -274,8 +283,37 @@ class Snake : public Displayable {
 				end_game = true;
 				return true;
 			}
+
+			//left block   [55, 465]  [65, 485]
+			//middle block [195, 255] [635, 285]
+			//right block  [655, 95]  [715, 125]
+			if (where == 0 && 
+				((block_list.front().first == 45 && block_list.front().second >= 465 && block_list.front().second <= 485) || 
+				 (block_list.front().first == 185 && block_list.front().second >= 255 && block_list.front().second <= 285) || 
+				 (block_list.front().first == 645 && block_list.front().second >= 95 && block_list.front().second <= 125))) {
+				end_game = true;
+				return true;
+			} else if (where == 1 && 
+				((block_list.front().first >= 55 && block_list.front().first <= 65 && block_list.front().second == 455) ||
+				 (block_list.front().first >= 195 && block_list.front().first <= 635 && block_list.front().second == 245) ||
+				 (block_list.front().first >= 655 && block_list.front().first <= 715 && block_list.front().second == 85))) {
+				end_game = true;
+				return true;
+			} else if (where == 2 && 
+				((block_list.front().first == 75 && block_list.front().second >= 465 && block_list.front().second <= 485) || 
+				 (block_list.front().first == 645 && block_list.front().second >= 255 && block_list.front().second <= 285) || 
+				 (block_list.front().first == 725 && block_list.front().second >= 95 && block_list.front().second <= 125))) {
+				end_game = true;
+				return true;
+			} else if (where == 3 &&
+				((block_list.front().first >= 55 && block_list.front().first <= 65 && block_list.front().second == 495) ||
+				 (block_list.front().first >= 195 && block_list.front().first <= 635 && block_list.front().second == 295) ||
+				 (block_list.front().first >= 655 && block_list.front().first <= 715 && block_list.front().second == 135))) {
+				end_game = true;
+				return true;
+			}
 			return false;
-        }
+		}
 
 		Snake(int dir, int receive): dir(dir), receive(receive) {
 			blockSize = 10;
@@ -315,6 +353,12 @@ class Edge : public Displayable {
 			XPoint points_2[] = {{0, 50}, {800, 50}};
 			int npoints_2 = sizeof(points_2) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_2, npoints_2, CoordModeOrigin);
+
+			//x [5, 785]
+			//y [55, 585]
+			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[1], 195, 255, 450, 40);
+			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[1], 55, 465, 20, 30);
+			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[1], 655, 95, 70, 40);
 		}
 };
 
@@ -448,12 +492,21 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XSetForeground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
 	XSetBackground(xInfo.display, xInfo.gc[i], WhitePixel(xInfo.display, xInfo.screen));
 	XSetFillStyle(xInfo.display, xInfo.gc[i], FillSolid);
-	XSetLineAttributes(xInfo.display, xInfo.gc[i], 10, // 5 is line width
+	XSetLineAttributes(xInfo.display, xInfo.gc[i], 10, // 10 is line width
 						 LineSolid, CapRound, JoinMiter); // other line options
 	// load a larger font
 	XFontStruct * font;
 	font = XLoadQueryFont (xInfo.display, "12x24");
 	XSetFont (xInfo.display, xInfo.gc[i], font->fid);
+
+	i = 2;
+	xInfo.gc[i] = XCreateGC(xInfo.display, xInfo.window, 0, 0);
+	XSetForeground(xInfo.display, xInfo.gc[i], WhitePixel(xInfo.display, xInfo.screen));
+	XSetBackground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
+	// load a larger font
+	XFontStruct * font_2;
+	font_2 = XLoadQueryFont (xInfo.display, "12x24");
+	XSetFont (xInfo.display, xInfo.gc[i], font_2->fid);
 
 
 	XSelectInput(xInfo.display, xInfo.window, 
@@ -583,11 +636,11 @@ unsigned long now() {
 
 void eventLoop(XInfo &xinfo) {
 	// Add stuff to paint to the display list
+	dList.push_front(&end_display);
 	dList.push_front(&edge);
 	dList.push_front(&fruit);
 	dList.push_front(&snake);
 	dList.push_front(&text_line);
-	dList.push_front(&end_display);
 	
 	XEvent event;
 	unsigned long lastRepaint = 0;
