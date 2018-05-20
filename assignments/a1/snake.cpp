@@ -43,6 +43,9 @@ int hit_pause = 0;
 int fruit_x = 305;
 int fruit_y = 455;
 int eat_fruit = 0;
+bool press_restart_fruit = false;
+bool press_restart_snake = false;
+bool press_restart_score = false;
 
 /*
  * Information to draw on the window.
@@ -75,6 +78,13 @@ class Displayable {
 class Fruit : public Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) {
+			if (press_restart_fruit == true) {
+				x = 305;
+				y = 455;
+				fruit_x = x;
+				fruit_y = y;
+				press_restart_fruit = false;
+			}
 			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], x, y, 10, 10);
 		}
 		
@@ -106,6 +116,24 @@ Fruit fruit;
 class Snake : public Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) {
+			if (press_restart_snake == true) {
+				block_list.clear();
+				dir = 0;
+				receive = 0;
+				wait = 0;
+				received_turn = false;
+				int xx_1 = 105;
+				int xx_2 = 95;
+				int xx_3 = 85;
+				int yy_1 = 255;
+				int yy_2 = 255;
+				int yy_3 = 255;
+				block_list.push_back(make_pair(xx_1, yy_2));
+				block_list.push_back(make_pair(xx_2, yy_2));
+				block_list.push_back(make_pair(xx_3, yy_3));
+				hit_pause = 0;
+				press_restart_snake = false;
+			}
 			for (vector<pair<int, int> >::iterator it = block_list.begin(); it != block_list.end(); ++it) {
 				XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], (*it).first, (*it).second, 10, blockSize);
 			}
@@ -150,10 +178,21 @@ class Snake : public Displayable {
 		 /* ** ADD YOUR LOGIC **
 		 * Use these placeholder methods as guidance for implementing the snake behaviour.
 		 * You do not have to use these methods, feel free to implement your own.*/
+		bool check_regenerate() {
+			for (vector<pair<int, int> >::iterator it = block_list.begin(); it != block_list.end(); ++it) {
+				if (fruit_x == (*it).first && fruit_y == (*it).second) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		void eat_add() {
 			block_list.insert(block_list.begin(), make_pair(fruit_x, fruit_y));
 			eat_fruit++;
-			fruit.re_generate();
+			do {
+				fruit.re_generate();
+			} while (check_regenerate());	
 		}
 
 		void didEatFruit(int where) {
@@ -238,6 +277,10 @@ class Edge : public Displayable {
 class Text : public Displayable {
 	public:
 		virtual void paint(XInfo& xinfo) {
+			if (press_restart_score == true) {
+				eat_fruit = 0;
+				press_restart_score = false;
+			}
 			ostringstream stream_1, stream_2, stream_3;
 			stream_1 << print_Speed;
 			stream_2 << print_FPS;
@@ -439,7 +482,9 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 				break;
 			case 'r': //restart
 			case 'R':
-				cerr << "received restart" << endl; 
+				press_restart_fruit = true;
+				press_restart_snake = true;
+				press_restart_score = true;
 				break;
 			case 'w':
 			case 'W':
@@ -533,6 +578,7 @@ void eventLoop(XInfo &xinfo) {
 
 		// IMPORTANT: sleep for a bit to let other processes work
 		if (XPending(xinfo.display) == 0) {
+			//cerr << "here" << endl;
 			usleep(1000000 / FPS - (end - lastRepaint));
 		}
 
