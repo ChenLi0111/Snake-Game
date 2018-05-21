@@ -117,27 +117,37 @@ class Start_Display : public Displayable {
 				XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], 0, 0, 800, 600);
 
 				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 100, s_1.c_str(), s_1.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 200, s_2.c_str(), s_2.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 250, s_3.c_str(), s_3.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 300, s_4.c_str(), s_4.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 350, s_5.c_str(), s_5.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 400, s_6.c_str(), s_6.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 450, s_7.c_str(), s_7.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 500, s_8.c_str(), s_8.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 550, s_9.c_str(), s_9.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 150, s_2.c_str(), s_2.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 175, s_3.c_str(), s_3.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 200, s_4.c_str(), s_4.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 225, s_5.c_str(), s_5.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 250, s_6.c_str(), s_6.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 275, s_7.c_str(), s_7.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 325, s_8.c_str(), s_8.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 350, s_9.c_str(), s_9.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 375, s_10.c_str(), s_10.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 400, s_11.c_str(), s_11.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 425, s_12.c_str(), s_12.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 450, s_13.c_str(), s_13.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 500, s_14.c_str(), s_14.length());
 			}
 		}
 
 	    Start_Display() {
 			s_1 = "First name: Chen, Last name: Li, student ID: 20597755.";
 			s_2 = "Welcome to this snake game.";
-			s_3 = "Please press k/K to start the game.";
-			s_4 = "Use w/a/s/d or arrows keys to control";
-			s_5 = " the direction of the snake.";
-			s_6 = "Use r/R to restart.";
-			s_7 = "Use p/P to pause.";
-			s_8 = "Use q/Q to quit the game.";
-			s_9 = "Good luck and have fun!";
+			s_3 = "Control the snake to eat fruits and avoid obstacles";
+			s_4 = " and its own body.";
+			s_5 = "The snake will grow longer when it eats a fruit.";
+			s_6 = "The more fruits the snake eats, the higher score";
+			s_7 = " you will receive.";
+			s_8 = "Please press k/K to start the game.";
+			s_9 = "Use w/a/s/d or arrows keys to control";
+			s_10 = " the direction of the snake.";
+			s_11 = "Use r/R to restart.";
+			s_12 = "Use p/P to pause.";
+			s_13 = "Use q/Q to quit the game.";
+			s_14 = "Good luck and have fun!";
 		}
 	private:
 		string s_1;
@@ -149,6 +159,11 @@ class Start_Display : public Displayable {
 		string s_7;
 		string s_8;
 		string s_9;
+		string s_10;
+		string s_11;
+		string s_12;
+		string s_13;
+		string s_14;
 };
 
 Start_Display start_display;
@@ -666,32 +681,23 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 				break;
 		}
 	}
-	switch(key){
+	switch(key) {
 			case XK_Up:
-				cout << "Up" << endl;
 				snake.change_keyboard(3);
 				break;
 			case XK_Down:
-				cout << "Down" << endl;
 				snake.change_keyboard(1);
 				break;
 			case XK_Left:
-				cout << "Left" << endl;
 				snake.change_keyboard(2);
 				break;
 			case XK_Right:
-				cout << "Right" << endl;
 				snake.change_keyboard(0);
 				break;
 	}
 }
 
 void handleAnimation(XInfo &xinfo, int inside) {
-	/*
-	 * ADD YOUR OWN LOGIC
-	 * This method handles animation for different objects on the screen 
-	 * and readies the next frame before the screen is re-painted.
-	 */
 	snake.move(xinfo);
 }
 
@@ -716,14 +722,9 @@ void eventLoop(XInfo &xinfo) {
 	int inside = 0;
 
 	while(true) {
-		/*
-		 * This is NOT a performant event loop!  
-		 * It needs help!
-		 */
-		
 		if (XPending(xinfo.display) > 0) {
 			XNextEvent(xinfo.display, &event);
-			//cout << "event.type=" << event.type << "\n";
+			cout << "event.type=" << event.type << "\n";
 			switch(event.type) {
 				case KeyPress:
 					handleKeyPress(xinfo, event);
@@ -738,7 +739,6 @@ void eventLoop(XInfo &xinfo) {
 		}
 
 		unsigned long end = now();
-
 		if (end - lastRepaint > 1000000 / FPS) {
 			handleAnimation(xinfo, inside);
 			repaint(xinfo);
@@ -747,16 +747,8 @@ void eventLoop(XInfo &xinfo) {
 
 		// IMPORTANT: sleep for a bit to let other processes work
 		if (XPending(xinfo.display) == 0) {
-			//cerr << "here" << endl;
 			usleep(1000000 / FPS - (end - lastRepaint));
-			//cerr << "(end - lastRepaint) = " << (end - lastRepaint) << endl;
-			//cerr << "1000000/ FPS = " << 1000000 / FPS << endl;
-			//cerr << "1000000 / FPS - (end - lastRepaint) = " << 1000000 / FPS - (end - lastRepaint) << endl << endl;
 		}
-		//cerr << FPS << endl;
-		//usleep(1000000/FPS);
-		//handleAnimation(xinfo, inside);
-		//repaint(xinfo);
 	}
 }
 
