@@ -243,9 +243,6 @@ class Snake : public Displayable {
 				wait = 0;
 			}
 			received_turn = false;
-			// ** ADD YOUR LOGIC **
-			// Here, you will be performing collision detection between the snake, 
-			// the fruit, and the obstacles depending on what the snake lands on.
 		}
 
 		bool check_regenerate() {
@@ -601,7 +598,7 @@ void repaint(XInfo &xinfo) {
 	// get height and width of window (might have changed since last repaint)
 
 	XWindowAttributes windowInfo;
-	XGetWindowAttributes(xinfo.display, xinfo.window, &windowInfo);
+	//XGetWindowAttributes(xinfo.display, xinfo.window, &windowInfo);
 	unsigned int height = windowInfo.height;
 	unsigned int width = windowInfo.width;
 
@@ -669,17 +666,21 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 				break;
 		}
 	}
-	switch(event.xkey.keycode){
-			case 134: //up
+	switch(key){
+			case XK_Up:
+				cout << "Up" << endl;
 				snake.change_keyboard(3);
 				break;
-			case 131: //left
-				snake.change_keyboard(2);
-				break;
-			case 133: //down
+			case XK_Down:
+				cout << "Down" << endl;
 				snake.change_keyboard(1);
 				break;
-			case 132: //right
+			case XK_Left:
+				cout << "Left" << endl;
+				snake.change_keyboard(2);
+				break;
+			case XK_Right:
+				cout << "Right" << endl;
 				snake.change_keyboard(0);
 				break;
 	}
@@ -737,6 +738,7 @@ void eventLoop(XInfo &xinfo) {
 		}
 
 		unsigned long end = now();
+
 		if (end - lastRepaint > 1000000 / FPS) {
 			handleAnimation(xinfo, inside);
 			repaint(xinfo);
@@ -747,8 +749,10 @@ void eventLoop(XInfo &xinfo) {
 		if (XPending(xinfo.display) == 0) {
 			//cerr << "here" << endl;
 			usleep(1000000 / FPS - (end - lastRepaint));
+			//cerr << "(end - lastRepaint) = " << (end - lastRepaint) << endl;
+			//cerr << "1000000/ FPS = " << 1000000 / FPS << endl;
+			//cerr << "1000000 / FPS - (end - lastRepaint) = " << 1000000 / FPS - (end - lastRepaint) << endl << endl;
 		}
-
 		//cerr << FPS << endl;
 		//usleep(1000000/FPS);
 		//handleAnimation(xinfo, inside);
