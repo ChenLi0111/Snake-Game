@@ -451,11 +451,17 @@ class Edge : public Displayable {
 			int npoints_5 = sizeof(points_5) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_5, npoints_5, CoordModeOrigin);
 
-			//x [5, 785]
-			//y [55, 585]
-			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[1], 195, 255, 450, 40);
-			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[1], 55, 465, 20, 30);
-			XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[1], 655, 95, 70, 40);
+			XPoint points_6[] = {{55, 465}, {55, 495}, {75, 495}, {75, 465}, {55, 465}};
+			int npoints_6 = sizeof(points_6) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_6, npoints_6, CoordModeOrigin);
+						
+			XPoint points_7[] = {{195, 255}, {195, 295}, {645, 295}, {645, 255}, {195, 255}};
+			int npoints_7 = sizeof(points_7) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_7, npoints_7, CoordModeOrigin);
+						
+			XPoint points_8[] = {{655, 95}, {655, 135}, {725, 135}, {725, 95}, {655, 95}};
+			int npoints_8 = sizeof(points_8) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_8, npoints_8, CoordModeOrigin);
 		}
 };
 
