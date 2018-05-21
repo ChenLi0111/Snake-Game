@@ -129,7 +129,8 @@ class Start_Display : public Displayable {
 				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 400, s_11.c_str(), s_11.length());
 				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 425, s_12.c_str(), s_12.length());
 				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 450, s_13.c_str(), s_13.length());
-				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 500, s_14.c_str(), s_14.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 475, s_14.c_str(), s_14.length());
+				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 525, s_15.c_str(), s_15.length());
 			}
 		}
 
@@ -141,13 +142,14 @@ class Start_Display : public Displayable {
 			s_5 = "The snake will grow longer when it eats a fruit.";
 			s_6 = "The more fruits the snake eats, the higher score";
 			s_7 = " you will receive.";
-			s_8 = "Please press k/K to start the game.";
-			s_9 = "Use w/a/s/d or arrows keys to control";
-			s_10 = " the direction of the snake.";
-			s_11 = "Use r/R to restart.";
-			s_12 = "Use p/P to pause.";
-			s_13 = "Use q/Q to quit the game.";
-			s_14 = "Good luck and have fun!";
+			s_8 = "Use gaps at the border to go to the other side.";
+			s_9 = "Please press k/K to start the game.";
+			s_10 = "Use w/a/s/d or arrows keys to control";
+			s_11 = " the direction of the snake.";
+			s_12 = "Use r/R to restart.";
+			s_13 = "Use p/P to pause.";
+			s_14 = "Use q/Q to quit the game.";
+			s_15 = "Good luck and have fun!";
 		}
 	private:
 		string s_1;
@@ -164,6 +166,7 @@ class Start_Display : public Displayable {
 		string s_12;
 		string s_13;
 		string s_14;
+		string s_15;
 };
 
 Start_Display start_display;
@@ -259,7 +262,7 @@ class Snake : public Displayable {
 				wait = 0;
 			}
 			received_turn = false;
-			cerr << block_list.front().first << " " << block_list.front().second << endl;
+			//cerr << block_list.front().first << " " << block_list.front().second << endl;
 		}
 
 		bool check_regenerate() {
@@ -294,7 +297,6 @@ class Snake : public Displayable {
 					block_list.front().second == fruit_y) {
 					eat_add();
 				} else {
-					
 					if (edge_gap == true) {
 						edge_gap = false;
 					} else {
@@ -307,7 +309,6 @@ class Snake : public Displayable {
 					block_list.front().second + 10 == fruit_y) {
 					eat_add();
 				} else {
-					
 					if (edge_gap == true) {
 						edge_gap = false;
 					} else {
@@ -320,7 +321,6 @@ class Snake : public Displayable {
 					block_list.front().second == fruit_y) {
 					eat_add();
 				} else {
-					
 					if (edge_gap == true) {
 						edge_gap = false;
 					} else {
@@ -333,7 +333,6 @@ class Snake : public Displayable {
 					block_list.front().second - 10 == fruit_y) {
 					eat_add();
 				} else {
-					
 					if (edge_gap == true) {
 						edge_gap = false;
 					} else {
@@ -348,11 +347,14 @@ class Snake : public Displayable {
 			//hit edges
 			//x [5, 785]
 			//y [55, 585]
-			//(5, 255), (305, 55), (605, 585), (785, 355)
 			if ((where == 0 && block_list.front().first >= 785 && block_list.front().second != 355) ||
 				(where == 1 && block_list.front().second >= 585 && block_list.front().first != 605) ||
 				(where == 2 && block_list.front().first <= 5 && block_list.front().second != 255) ||
-				(where == 3 && block_list.front().second <= 55 && block_list.front().first != 305)) {
+				(where == 3 && block_list.front().second <= 55 && block_list.front().first != 305) ||
+				((where == 1 || where == 3) && block_list.front().first == 795 && block_list.front().second == 355) ||
+				((where == 0 || where == 2) && block_list.front().first == 605 && block_list.front().second == 595) || 
+				((where == 1 || where == 3) && block_list.front().first == 5 && block_list.front().second == 255) ||
+				((where == 0 || where == 2) && block_list.front().first == 305 && block_list.front().second == 45)) {
 				end_game = true;
 				return true;
 			}
@@ -419,7 +421,7 @@ class Snake : public Displayable {
 			}
 
 			//gaps
-			//(5, 255), (305, 55), (605, 585), (785, 355)
+			//(5, 255), (305, 45), (605, 585), (785, 355)
 			if (where == 0 && block_list.front().first == 795 && block_list.front().second == 355) {
 				update_list();
 				edge_gap = true;
