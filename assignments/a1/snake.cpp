@@ -207,6 +207,7 @@ class Snake : public Displayable {
 				dir = 0;
 				receive = 0;
 				wait = 0;
+				edge_gap = false;
 				received_turn = false;
 				int xx_1 = 105;
 				int xx_2 = 95;
@@ -245,7 +246,6 @@ class Snake : public Displayable {
 		void move(XInfo &xinfo) {
 			//x [5, 785]
 			//y [55, 585]
-			//(5, 255), (305, 55), (605, 585), (785, 355)
 			if ((hit_pause != 0 && (hit_pause % 2)) || (end_game == true) || (start_game == true)) {return;}
 			if (received_turn != true) {trun();}
 
@@ -294,32 +294,52 @@ class Snake : public Displayable {
 					block_list.front().second == fruit_y) {
 					eat_add();
 				} else {
-					update_list();
-					block_list.front().first += 10;
+					
+					if (edge_gap == true) {
+						edge_gap = false;
+					} else {
+						update_list();
+						block_list.front().first += 10;
+					}
 				}	
 			} else if (where == 1) {
 				if (block_list.front().first == fruit_x && 
 					block_list.front().second + 10 == fruit_y) {
 					eat_add();
 				} else {
-					update_list();
-					block_list.front().second += 10;
+					
+					if (edge_gap == true) {
+						edge_gap = false;
+					} else {
+						update_list();
+						block_list.front().second += 10;
+					}
 				}
 			} else if (where == 2) {
 				if (block_list.front().first - 10 == fruit_x && 
 					block_list.front().second == fruit_y) {
 					eat_add();
 				} else {
-					update_list();
-					block_list.front().first -= 10;
+					
+					if (edge_gap == true) {
+						edge_gap = false;
+					} else {
+						update_list();
+						block_list.front().first -= 10;
+					}
 				}
 			} else if (where == 3) {
 				if (block_list.front().first == fruit_x && 
 					block_list.front().second - 10 == fruit_y) {
 					eat_add();
 				} else {
-					update_list();
-					block_list.front().second -= 10;
+					
+					if (edge_gap == true) {
+						edge_gap = false;
+					} else {
+						update_list();
+						block_list.front().second -= 10;
+					}
 				}
 			}
 		}
@@ -328,10 +348,11 @@ class Snake : public Displayable {
 			//hit edges
 			//x [5, 785]
 			//y [55, 585]
-			if ((where == 0 && block_list.front().first >= 785) ||
-				(where == 1 && block_list.front().second >= 585) ||
-				(where == 2 && block_list.front().first <= 5) ||
-				(where == 3 && block_list.front().second <= 55)) {
+			//(5, 255), (305, 55), (605, 585), (785, 355)
+			if ((where == 0 && block_list.front().first >= 785 && block_list.front().second != 355) ||
+				(where == 1 && block_list.front().second >= 585 && block_list.front().first != 605) ||
+				(where == 2 && block_list.front().first <= 5 && block_list.front().second != 255) ||
+				(where == 3 && block_list.front().second <= 55 && block_list.front().first != 305)) {
 				end_game = true;
 				return true;
 			}
@@ -396,6 +417,35 @@ class Snake : public Displayable {
 					}
 				}
 			}
+
+			//gaps
+			//(5, 255), (305, 55), (605, 585), (785, 355)
+			if (where == 0 && block_list.front().first == 795 && block_list.front().second == 355) {
+				update_list();
+				edge_gap = true;
+				block_list.front().first = 5;
+				block_list.front().second = 255;
+				return false;
+			} else if (where == 1 && block_list.front().first == 605 && block_list.front().second == 595) {
+				update_list();
+				edge_gap = true;
+				block_list.front().first = 305;
+				block_list.front().second = 45;
+				return false;
+			} else if (where == 2 && block_list.front().first == 5 && block_list.front().second == 255) {
+				update_list();
+				edge_gap = true;
+				block_list.front().first = 795;
+				block_list.front().second = 355;
+				return false;
+			} else if (where == 3 && block_list.front().first == 305 && block_list.front().second == 45) {
+				update_list();
+				edge_gap = true;
+				block_list.front().first = 605;
+				block_list.front().second = 595;
+				return false;
+			}
+
 			return false;
 		}
 
@@ -403,6 +453,7 @@ class Snake : public Displayable {
 			blockSize = 10;
 			wait = 0;
 			received_turn = false;
+			edge_gap = false;
 			int x_1 = 105;
 			int x_2 = 95;
 			int x_3 = 85;
@@ -424,6 +475,7 @@ class Snake : public Displayable {
 		int receive; // 0 d; 1 s; 2 a; 3 w
 		int wait;
 		bool received_turn;
+		bool edge_gap;
 		std::vector< pair<int, int> > block_list;
 };
 
