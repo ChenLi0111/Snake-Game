@@ -245,6 +245,7 @@ class Snake : public Displayable {
 		void move(XInfo &xinfo) {
 			//x [5, 785]
 			//y [55, 585]
+			//(5, 255), (305, 55), (605, 585), (785, 355)
 			if ((hit_pause != 0 && (hit_pause % 2)) || (end_game == true) || (start_game == true)) {return;}
 			if (received_turn != true) {trun();}
 
@@ -258,6 +259,7 @@ class Snake : public Displayable {
 				wait = 0;
 			}
 			received_turn = false;
+			cerr << block_list.front().first << " " << block_list.front().second << endl;
 		}
 
 		bool check_regenerate() {
@@ -428,13 +430,26 @@ class Snake : public Displayable {
 class Edge : public Displayable {
 	public:
 		virtual void paint(XInfo& xinfo) {
-			XPoint points[] = {{0, 0}, {800, 0}, {800, 600}, {0, 600}, {0,0}};
-			int npoints = sizeof(points) / sizeof(XPoint);
-			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points, npoints, CoordModeOrigin);
+			//(5, 255), (305, 55), (605, 585), (785, 355)
+			XPoint points_1[] = {{0, 255}, {0, 0}, {800, 0}, {800, 355}};
+			int npoints_1 = sizeof(points_1) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_1, npoints_1, CoordModeOrigin);
 
-			XPoint points_2[] = {{0, 50}, {800, 50}};
+			XPoint points_2[] = {{0, 265}, {0, 600}, {605, 600}};
 			int npoints_2 = sizeof(points_2) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_2, npoints_2, CoordModeOrigin);
+
+			XPoint points_3[] = {{615, 600}, {800, 600}, {800, 365}};
+			int npoints_3 = sizeof(points_3) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_3, npoints_3, CoordModeOrigin);
+
+			XPoint points_4[] = {{0, 50}, {305, 50}};
+			int npoints_4 = sizeof(points_4) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_4, npoints_4, CoordModeOrigin);
+
+			XPoint points_5[] = {{315, 50}, {800, 50}};
+			int npoints_5 = sizeof(points_5) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_5, npoints_5, CoordModeOrigin);
 
 			//x [5, 785]
 			//y [55, 585]
@@ -540,22 +555,22 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	hints.flags = PPosition | PSize;
 
 	xInfo.window = XCreateSimpleWindow( 
-		xInfo.display,				// display where window appears
+		xInfo.display, // display where window appears
 		DefaultRootWindow( xInfo.display ), // window's parent in window tree
-		hints.x, hints.y,			// upper left corner location
-		hints.width, hints.height,	// size of the window
-		Border,						// width of window's border
-		black,						// window border colour
-		white );					// window background colour
+		hints.x, hints.y, // upper left corner location
+		hints.width, hints.height, // size of the window
+		Border, // width of window's border
+		black, // window border colour
+		white); // window background colour
 		
 	XSetStandardProperties(
-		xInfo.display,		// display containing the window
-		xInfo.window,		// window whose properties are set
-		"animation",		// window's title
-		"Animate",			// icon's title
-		None,				// pixmap for the icon
-		argv, argc,			// applications command line args
-		&hints );			// size hints for the window
+		xInfo.display, // display containing the window
+		xInfo.window, // window whose properties are set
+		"animation", // window's title
+		"Animate", // icon's title
+		None, // pixmap for the icon
+		argv, argc, // applications command line args
+		&hints); // size hints for the window
 
 	/* 
 	 * Create Graphics Contexts
@@ -637,11 +652,11 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 	 * This is a simplified approach that does NOT use localization.
 	 */
 	int i = XLookupString( 
-		(XKeyEvent *)&event, 	// the keyboard event
-		text, 					// buffer when text will be written
-		BufferSize, 			// size of the text buffer
-		&key, 					// workstation-independent key symbol
-		NULL);					// pointer to a composeStatus structure (unused)
+		(XKeyEvent *)&event, // the keyboard event
+		text, // buffer when text will be written
+		BufferSize, // size of the text buffer
+		&key, // workstation-independent key symbol
+		NULL); // pointer to a composeStatus structure (unused)
 	if (i == 1) {
 		printf("Got key press -- %c\n", text[0]);
 		switch(text[0]) {
@@ -724,7 +739,7 @@ void eventLoop(XInfo &xinfo) {
 	while(true) {
 		if (XPending(xinfo.display) > 0) {
 			XNextEvent(xinfo.display, &event);
-			cout << "event.type=" << event.type << "\n";
+			//cout << "event.type=" << event.type << "\n";
 			switch(event.type) {
 				case KeyPress:
 					handleKeyPress(xinfo, event);
