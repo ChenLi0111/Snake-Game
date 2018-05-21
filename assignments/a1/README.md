@@ -1,6 +1,6 @@
 # CS 349 Assignment 1: Snake game
 
-Description of the game:
+Description of the game:\n
 Control the snake to eat fruits and avoid obstacles and its own body.
 The snake will grow longer when it eats a fruit.
 The more fruits the snake eats, the higher score you will receive.
