@@ -484,27 +484,27 @@ class Snake : public Displayable {
 class Edge : public Displayable {
 	public:
 		virtual void paint(XInfo& xinfo) {
-			//(5, 255), (305, 55), (605, 585), (785, 355)
-			XPoint points_1[] = {{0, 255}, {0, 0}, {800, 0}, {800, 355}};
+			XPoint points_1[] = {{5, 255}, {5, 5}, {795, 5}, {795, 355}};
 			int npoints_1 = sizeof(points_1) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_1, npoints_1, CoordModeOrigin);
 
-			XPoint points_2[] = {{0, 265}, {0, 600}, {605, 600}};
+			XPoint points_2[] = {{5, 265}, {5, 595}, {605, 595}};
 			int npoints_2 = sizeof(points_2) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_2, npoints_2, CoordModeOrigin);
 
-			XPoint points_3[] = {{615, 600}, {800, 600}, {800, 365}};
+			XPoint points_3[] = {{615, 595}, {795, 595}, {795, 365}};
 			int npoints_3 = sizeof(points_3) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_3, npoints_3, CoordModeOrigin);
 
-			XPoint points_4[] = {{0, 50}, {305, 50}};
+			XPoint points_4[] = {{5, 45}, {305, 45}};
 			int npoints_4 = sizeof(points_4) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_4, npoints_4, CoordModeOrigin);
 
-			XPoint points_5[] = {{315, 50}, {800, 50}};
+			XPoint points_5[] = {{315, 45}, {795, 45}};
 			int npoints_5 = sizeof(points_5) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_5, npoints_5, CoordModeOrigin);
 
+			//TO DO change x y
 			XPoint points_6[] = {{55, 465}, {55, 495}, {75, 495}, {75, 465}, {55, 465}};
 			int npoints_6 = sizeof(points_6) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_6, npoints_6, CoordModeOrigin);
@@ -546,9 +546,7 @@ class Text : public Displayable {
 			s.append(stream_2.str());
 			s.append(" Speed: ");
 			s.append(stream_1.str());
-
-			XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[1], 
-				x, y, s.c_str(), s.length());
+			XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[1], x, y, s.c_str(), s.length());
 		}
 
 		Text(int x, int y): x(x), y(y) {
@@ -577,7 +575,7 @@ list<Displayable *> dList; // list of Displayables
 Snake snake(0, 0);
 
 Edge edge;
-Text text_line(25, 30);
+Text text_line(25, 35);
 
 /*
  * Initialize X and create a window
