@@ -508,14 +508,23 @@ class Edge : public Displayable {
 			XPoint points_6[] = {{55, 465}, {55, 495}, {75, 495}, {75, 465}, {55, 465}};
 			int npoints_6 = sizeof(points_6) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_6, npoints_6, CoordModeOrigin);
+			XPoint points_9[] = {{55, 465}, {75, 495}, {75, 465},{55, 495}};
+			int npoints_9 = sizeof(points_6) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_9, npoints_9, CoordModeOrigin);
 						
 			XPoint points_7[] = {{195, 255}, {195, 295}, {645, 295}, {645, 255}, {195, 255}};
 			int npoints_7 = sizeof(points_7) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_7, npoints_7, CoordModeOrigin);
+			XPoint points_10[] = {{195, 255},{645, 295}, {645, 255}, {195, 295}};
+			int npoints_10 = sizeof(points_10) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_10, npoints_10, CoordModeOrigin);
 						
 			XPoint points_8[] = {{655, 95}, {655, 135}, {725, 135}, {725, 95}, {655, 95}};
 			int npoints_8 = sizeof(points_8) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_8, npoints_8, CoordModeOrigin);
+			XPoint points_11[] = {{655, 95}, {725, 135}, {725, 95}, {655, 135}};
+			int npoints_11 = sizeof(points_11) / sizeof(XPoint);
+			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_11, npoints_11, CoordModeOrigin);
 		}
 };
 
