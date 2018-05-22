@@ -81,8 +81,8 @@ class Fruit : public Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) {
 			if (press_restart_fruit == true) {
-				x = 305;
-				y = 455;
+				x = 300;
+				y = 450;
 				fruit_x = x;
 				fruit_y = y;
 				press_restart_fruit = false;
@@ -92,12 +92,12 @@ class Fruit : public Displayable {
 		}
 		
 		Fruit() {
-			x = 305;
-			y = 455;
+			x = 300;
+			y = 450;
 		}
 		
 		void re_generate(){
-			x = (rand() % 78) * 10 + 5; //x [5, 785]
+			x = (rand() % 78) * 10 + 10; //x [5, 785]
 			y = (rand() % 53) * 10 + 55; //y [55, 585]
 			fruit_x = x;
 			fruit_y = y;
@@ -212,13 +212,13 @@ class Snake : public Displayable {
 				wait = 0;
 				edge_gap = false;
 				received_turn = false;
-				int xx_1 = 105;
-				int xx_2 = 95;
-				int xx_3 = 85;
-				int yy_1 = 255;
-				int yy_2 = 255;
-				int yy_3 = 255;
-				block_list.push_back(make_pair(xx_1, yy_2));
+				int xx_1 = 100;
+				int xx_2 = 90;
+				int xx_3 = 80;
+				int yy_1 = 260;
+				int yy_2 = 260;
+				int yy_3 = 260;
+				block_list.push_back(make_pair(xx_1, yy_1));
 				block_list.push_back(make_pair(xx_2, yy_2));
 				block_list.push_back(make_pair(xx_3, yy_3));
 				hit_pause = 0;
@@ -262,7 +262,7 @@ class Snake : public Displayable {
 				wait = 0;
 			}
 			received_turn = false;
-			//cerr << block_list.front().first << " " << block_list.front().second << endl;
+			cerr << block_list.front().first << " " << block_list.front().second << endl;
 		}
 
 		bool check_regenerate() {
@@ -456,13 +456,13 @@ class Snake : public Displayable {
 			wait = 0;
 			received_turn = false;
 			edge_gap = false;
-			int x_1 = 105;
-			int x_2 = 95;
-			int x_3 = 85;
-			int y_1 = 255;
-			int y_2 = 255;
-			int y_3 = 255;
-			block_list.push_back(make_pair(x_1, y_2));
+			int x_1 = 100;
+			int x_2 = 90;
+			int x_3 = 80;
+			int y_1 = 260;
+			int y_2 = 260;
+			int y_3 = 260;
+			block_list.push_back(make_pair(x_1, y_1));
 			block_list.push_back(make_pair(x_2, y_2));
 			block_list.push_back(make_pair(x_3, y_3));
 		}
@@ -484,15 +484,15 @@ class Snake : public Displayable {
 class Edge : public Displayable {
 	public:
 		virtual void paint(XInfo& xinfo) {
-			XPoint points_1[] = {{5, 255}, {5, 5}, {795, 5}, {795, 355}};
+			XPoint points_1[] = {{5, 265}, {5, 5}, {795, 5}, {795, 360}};
 			int npoints_1 = sizeof(points_1) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_1, npoints_1, CoordModeOrigin);
 
-			XPoint points_2[] = {{5, 265}, {5, 595}, {605, 595}};
+			XPoint points_2[] = {{5, 275}, {5, 595}, {605, 595}};
 			int npoints_2 = sizeof(points_2) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_2, npoints_2, CoordModeOrigin);
 
-			XPoint points_3[] = {{615, 595}, {795, 595}, {795, 365}};
+			XPoint points_3[] = {{615, 595}, {795, 595}, {795, 370}};
 			int npoints_3 = sizeof(points_3) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_3, npoints_3, CoordModeOrigin);
 
@@ -505,24 +505,24 @@ class Edge : public Displayable {
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_5, npoints_5, CoordModeOrigin);
 
 			//TO DO change x y
-			XPoint points_6[] = {{55, 465}, {55, 495}, {75, 495}, {75, 465}, {55, 465}};
+			XPoint points_6[] = {{55, 470}, {55, 500}, {75, 500}, {75, 470}, {55, 470}};
 			int npoints_6 = sizeof(points_6) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_6, npoints_6, CoordModeOrigin);
-			XPoint points_9[] = {{55, 465}, {75, 495}, {75, 465},{55, 495}};
+			XPoint points_9[] = {{55, 470}, {75, 500}, {75, 470},{55, 500}};
 			int npoints_9 = sizeof(points_6) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_9, npoints_9, CoordModeOrigin);
 						
-			XPoint points_7[] = {{195, 255}, {195, 295}, {645, 295}, {645, 255}, {195, 255}};
+			XPoint points_7[] = {{195, 260}, {195, 300}, {645, 300}, {645, 260}, {195, 260}};
 			int npoints_7 = sizeof(points_7) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_7, npoints_7, CoordModeOrigin);
-			XPoint points_10[] = {{195, 255},{645, 295}, {645, 255}, {195, 295}};
+			XPoint points_10[] = {{195, 260},{645, 300}, {645, 260}, {195, 300}};
 			int npoints_10 = sizeof(points_10) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_10, npoints_10, CoordModeOrigin);
 						
-			XPoint points_8[] = {{655, 95}, {655, 135}, {725, 135}, {725, 95}, {655, 95}};
+			XPoint points_8[] = {{655, 100}, {655, 140}, {725, 140}, {725, 100}, {655, 100}};
 			int npoints_8 = sizeof(points_8) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_8, npoints_8, CoordModeOrigin);
-			XPoint points_11[] = {{655, 95}, {725, 135}, {725, 95}, {655, 135}};
+			XPoint points_11[] = {{655, 100}, {725, 140}, {725, 100}, {655, 140}};
 			int npoints_11 = sizeof(points_11) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_11, npoints_11, CoordModeOrigin);
 		}
