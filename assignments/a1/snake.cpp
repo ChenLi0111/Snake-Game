@@ -40,8 +40,8 @@ int speed = 5;
 const int width = 800;
 const int height = 600;
 int hit_pause = 0;
-int fruit_x = 305;
-int fruit_y = 455;
+int fruit_x = 300;
+int fruit_y = 450;
 int eat_fruit = 0;
 bool press_restart_fruit = false;
 bool press_restart_snake = false;
@@ -68,6 +68,23 @@ void error(string str) {
 	cerr << str << endl;
 	exit(0);
 }
+/* exit:
+(0, 260) left
+(790, 360) right
+(600, 590) down
+(300, 40) up
+
+left:
+x [60, 80]
+y [470, 500]
+s
+middle:
+x [200, 650]
+y [260, 300]
+
+right:
+x [660, 730]
+y [100, 140]*/
 
 /*
  * An abstract class representing displayable things. 
@@ -97,8 +114,8 @@ class Fruit : public Displayable {
 		}
 		
 		void re_generate(){
-			x = (rand() % 78) * 10 + 10; //x [5, 785]
-			y = (rand() % 53) * 10 + 55; //y [55, 585]
+			x = (rand() % 78) * 10 + 10;
+			y = (rand() % 54) * 10 + 50;
 			fruit_x = x;
 			fruit_y = y;
         }
@@ -115,7 +132,6 @@ class Start_Display : public Displayable {
 		virtual void paint(XInfo& xinfo) {
 			if (start_game == true) {
 				XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], 0, 0, 800, 600);
-
 				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 100, s_1.c_str(), s_1.length());
 				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 150, s_2.c_str(), s_2.length());
 				XDrawImageString(xinfo.display, xinfo.window, xinfo.gc[2], 100, 175, s_3.c_str(), s_3.length());
@@ -142,15 +158,16 @@ class Start_Display : public Displayable {
 			s_5 = "The snake will grow longer when it eats a fruit.";
 			s_6 = "The more fruits the snake eats, the higher score";
 			s_7 = " you will receive.";
-			s_8 = "Use gaps at the border to go to the other side.";
+			s_8 = "Use gaps at the border to go to the oppsite side.";
 			s_9 = "Please press k/K to start the game.";
-			s_10 = "Use w/a/s/d or arrows keys to control";
+			s_10 = "Use w/W/a/A/s/S/d/D or arrows keys to control";
 			s_11 = " the direction of the snake.";
 			s_12 = "Use r/R to restart.";
 			s_13 = "Use p/P to pause.";
 			s_14 = "Use q/Q to quit the game.";
 			s_15 = "Good luck and have fun!";
 		}
+
 	private:
 		string s_1;
 		string s_2;
@@ -194,6 +211,7 @@ class End_Display : public Displayable {
 			y = 250;
 			s = "Game Over!";
 		}
+
 	private:
 		string s;
 		int x;
@@ -247,8 +265,6 @@ class Snake : public Displayable {
 		}
 		
 		void move(XInfo &xinfo) {
-			//x [5, 785]
-			//y [55, 585]
 			if ((hit_pause != 0 && (hit_pause % 2)) || (end_game == true) || (start_game == true)) {return;}
 			if (received_turn != true) {trun();}
 
@@ -257,21 +273,17 @@ class Snake : public Displayable {
 				return;
 			} else {
 				if (didHitObstacle(dir)) {return;}
-				didHitObstacle(dir);
 				didEatFruit(dir);
 				wait = 0;
 			}
 			received_turn = false;
-			cerr << block_list.front().first << " " << block_list.front().second << endl;
+			//cerr << block_list.front().first << " " << block_list.front().second << endl;
 		}
 
 		bool check_regenerate() {
-			//left block   [55, 465]  [65, 485]
-			//middle block [195, 255] [635, 285]
-			//right block  [655, 95]  [715, 125]
-			if ((fruit_x >= 55 && fruit_x <= 65 && fruit_y >= 465 && fruit_y <= 485) ||
-				(fruit_x >= 195 && fruit_x <= 635 && fruit_y >= 255 && fruit_y <= 285) ||
-				(fruit_x >= 655 && fruit_x <= 715 && fruit_y >= 95 && fruit_y <= 125)) {
+			if ((fruit_x >= 60 && fruit_x <= 80 && fruit_y >= 470 && fruit_y <= 500) ||
+				(fruit_x >= 200 && fruit_x <= 650 && fruit_y >= 260 && fruit_y <= 300) ||
+				(fruit_x >= 660 && fruit_x <= 730 && fruit_y >= 100 && fruit_y <= 140)) {
 				return true;
 			}
 
@@ -345,46 +357,41 @@ class Snake : public Displayable {
 
 		bool didHitObstacle(int where) {
 			//hit edges
-			//x [5, 785]
-			//y [55, 585]
-			if ((where == 0 && block_list.front().first >= 785 && block_list.front().second != 355) ||
-				(where == 1 && block_list.front().second >= 585 && block_list.front().first != 605) ||
-				(where == 2 && block_list.front().first <= 5 && block_list.front().second != 255) ||
-				(where == 3 && block_list.front().second <= 55 && block_list.front().first != 305) ||
-				((where == 1 || where == 3) && block_list.front().first == 795 && block_list.front().second == 355) ||
-				((where == 0 || where == 2) && block_list.front().first == 605 && block_list.front().second == 595) || 
-				((where == 1 || where == 3) && block_list.front().first == 5 && block_list.front().second == 255) ||
-				((where == 0 || where == 2) && block_list.front().first == 305 && block_list.front().second == 45)) {
+			if ((where == 0 && block_list.front().first >= 780 && block_list.front().second != 360) ||
+				(where == 1 && block_list.front().second >= 580 && block_list.front().first != 600) ||
+				(where == 2 && block_list.front().first <= 10 && block_list.front().second != 260) ||
+				(where == 3 && block_list.front().second <= 50 && block_list.front().first != 300) ||
+				((where == 1 || where == 3) && block_list.front().first == 790 && block_list.front().second == 360) ||
+				((where == 0 || where == 2) && block_list.front().first == 600 && block_list.front().second == 590) || 
+				((where == 1 || where == 3) && block_list.front().first == 0 && block_list.front().second == 260) ||
+				((where == 0 || where == 2) && block_list.front().first == 300 && block_list.front().second == 40)) {
 				end_game = true;
 				return true;
 			}
 
 			//hit a block
-			//left block   [55, 465]  [65, 485]
-			//middle block [195, 255] [635, 285]
-			//right block  [655, 95]  [715, 125]
 			if (where == 0 && 
-				((block_list.front().first == 45 && block_list.front().second >= 465 && block_list.front().second <= 485) || 
-				 (block_list.front().first == 185 && block_list.front().second >= 255 && block_list.front().second <= 285) || 
-				 (block_list.front().first == 645 && block_list.front().second >= 95 && block_list.front().second <= 125))) {
+				((block_list.front().first == 50 && block_list.front().second >= 470 && block_list.front().second <= 490) || 
+				 (block_list.front().first == 190 && block_list.front().second >= 260 && block_list.front().second <= 290) || 
+				 (block_list.front().first == 650 && block_list.front().second >= 100 && block_list.front().second <= 130))) {
 				end_game = true;
 				return true;
 			} else if (where == 1 && 
-				((block_list.front().first >= 55 && block_list.front().first <= 65 && block_list.front().second == 455) ||
-				 (block_list.front().first >= 195 && block_list.front().first <= 635 && block_list.front().second == 245) ||
-				 (block_list.front().first >= 655 && block_list.front().first <= 715 && block_list.front().second == 85))) {
+				((block_list.front().first >= 60 && block_list.front().first <= 70 && block_list.front().second == 460) ||
+				 (block_list.front().first >= 200 && block_list.front().first <= 640 && block_list.front().second == 250) ||
+				 (block_list.front().first >= 660 && block_list.front().first <= 720 && block_list.front().second == 90))) {
 				end_game = true;
 				return true;
 			} else if (where == 2 && 
-				((block_list.front().first == 75 && block_list.front().second >= 465 && block_list.front().second <= 485) || 
-				 (block_list.front().first == 645 && block_list.front().second >= 255 && block_list.front().second <= 285) || 
-				 (block_list.front().first == 725 && block_list.front().second >= 95 && block_list.front().second <= 125))) {
+				((block_list.front().first == 80 && block_list.front().second >= 470 && block_list.front().second <= 490) || 
+				 (block_list.front().first == 650 && block_list.front().second >= 260 && block_list.front().second <= 290) || 
+				 (block_list.front().first == 730 && block_list.front().second >= 100 && block_list.front().second <= 130))) {
 				end_game = true;
 				return true;
 			} else if (where == 3 &&
-				((block_list.front().first >= 55 && block_list.front().first <= 65 && block_list.front().second == 495) ||
-				 (block_list.front().first >= 195 && block_list.front().first <= 635 && block_list.front().second == 295) ||
-				 (block_list.front().first >= 655 && block_list.front().first <= 715 && block_list.front().second == 135))) {
+				((block_list.front().first >= 60 && block_list.front().first <= 70 && block_list.front().second == 500) ||
+				 (block_list.front().first >= 200 && block_list.front().first <= 640 && block_list.front().second == 300) ||
+				 (block_list.front().first >= 660 && block_list.front().first <= 720 && block_list.front().second == 140))) {
 				end_game = true;
 				return true;
 			}
@@ -421,30 +428,29 @@ class Snake : public Displayable {
 			}
 
 			//gaps
-			//(5, 255), (305, 45), (605, 585), (785, 355)
-			if (where == 0 && block_list.front().first == 795 && block_list.front().second == 355) {
+			if (where == 0 && block_list.front().first == 790 && block_list.front().second == 360) {
 				update_list();
 				edge_gap = true;
-				block_list.front().first = 5;
-				block_list.front().second = 255;
+				block_list.front().first = 0;
+				block_list.front().second = 260;
 				return false;
-			} else if (where == 1 && block_list.front().first == 605 && block_list.front().second == 595) {
+			} else if (where == 1 && block_list.front().first == 600 && block_list.front().second == 590) {
 				update_list();
 				edge_gap = true;
-				block_list.front().first = 305;
-				block_list.front().second = 45;
+				block_list.front().first = 300;
+				block_list.front().second = 40;
 				return false;
-			} else if (where == 2 && block_list.front().first == 5 && block_list.front().second == 255) {
+			} else if (where == 2 && block_list.front().first == 0 && block_list.front().second == 260) {
 				update_list();
 				edge_gap = true;
-				block_list.front().first = 795;
-				block_list.front().second = 355;
+				block_list.front().first = 790;
+				block_list.front().second = 360;
 				return false;
-			} else if (where == 3 && block_list.front().first == 305 && block_list.front().second == 45) {
+			} else if (where == 3 && block_list.front().first == 300 && block_list.front().second == 40) {
 				update_list();
 				edge_gap = true;
-				block_list.front().first = 605;
-				block_list.front().second = 595;
+				block_list.front().first = 600;
+				block_list.front().second = 590;
 				return false;
 			}
 
@@ -468,6 +474,7 @@ class Snake : public Displayable {
 		}
 
 		void change_keyboard(int re) {
+			if (start_game == true) {return;}
 			receive = re;
 		}
 
@@ -484,45 +491,44 @@ class Snake : public Displayable {
 class Edge : public Displayable {
 	public:
 		virtual void paint(XInfo& xinfo) {
-			XPoint points_1[] = {{5, 265}, {5, 5}, {795, 5}, {795, 360}};
+			XPoint points_1[] = {{5, 260}, {5, 5}, {795, 5}, {795, 360}};
 			int npoints_1 = sizeof(points_1) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_1, npoints_1, CoordModeOrigin);
 
-			XPoint points_2[] = {{5, 275}, {5, 595}, {605, 595}};
+			XPoint points_2[] = {{5, 270}, {5, 595}, {600, 595}};
 			int npoints_2 = sizeof(points_2) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_2, npoints_2, CoordModeOrigin);
 
-			XPoint points_3[] = {{615, 595}, {795, 595}, {795, 370}};
+			XPoint points_3[] = {{610, 595}, {795, 595}, {795, 370}};
 			int npoints_3 = sizeof(points_3) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_3, npoints_3, CoordModeOrigin);
 
-			XPoint points_4[] = {{5, 45}, {305, 45}};
+			XPoint points_4[] = {{5, 45}, {300, 45}};
 			int npoints_4 = sizeof(points_4) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_4, npoints_4, CoordModeOrigin);
 
-			XPoint points_5[] = {{315, 45}, {795, 45}};
+			XPoint points_5[] = {{310, 45}, {795, 45}};
 			int npoints_5 = sizeof(points_5) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[1], points_5, npoints_5, CoordModeOrigin);
 
-			//TO DO change x y
-			XPoint points_6[] = {{55, 470}, {55, 500}, {75, 500}, {75, 470}, {55, 470}};
+			XPoint points_6[] = {{60, 470}, {60, 500}, {80, 500}, {80, 470}, {60, 470}};
 			int npoints_6 = sizeof(points_6) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_6, npoints_6, CoordModeOrigin);
-			XPoint points_9[] = {{55, 470}, {75, 500}, {75, 470},{55, 500}};
-			int npoints_9 = sizeof(points_6) / sizeof(XPoint);
+			XPoint points_9[] = {{60, 470}, {80, 500}, {80, 470},{60, 500}};
+			int npoints_9 = sizeof(points_9) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_9, npoints_9, CoordModeOrigin);
 						
-			XPoint points_7[] = {{195, 260}, {195, 300}, {645, 300}, {645, 260}, {195, 260}};
+			XPoint points_7[] = {{200, 260}, {200, 300}, {650, 300}, {650, 260}, {200, 260}};
 			int npoints_7 = sizeof(points_7) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_7, npoints_7, CoordModeOrigin);
-			XPoint points_10[] = {{195, 260},{645, 300}, {645, 260}, {195, 300}};
+			XPoint points_10[] = {{200, 260},{650, 300}, {650, 260}, {200, 300}};
 			int npoints_10 = sizeof(points_10) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_10, npoints_10, CoordModeOrigin);
 						
-			XPoint points_8[] = {{655, 100}, {655, 140}, {725, 140}, {725, 100}, {655, 100}};
+			XPoint points_8[] = {{660, 100}, {660, 140}, {730, 140}, {730, 100}, {660, 100}};
 			int npoints_8 = sizeof(points_8) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_8, npoints_8, CoordModeOrigin);
-			XPoint points_11[] = {{655, 100}, {725, 140}, {725, 100}, {655, 140}};
+			XPoint points_11[] = {{660, 100}, {730, 140}, {730, 100}, {660, 140}};
 			int npoints_11 = sizeof(points_11) / sizeof(XPoint);
 			XDrawLines(xinfo.display, xinfo.window, xinfo.gc[0], points_11, npoints_11, CoordModeOrigin);
 		}
@@ -760,6 +766,7 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 			case 'k':
 			case 'K':
 				start_game = false;
+				hit_pause = 0;
 				break;
 		}
 	}

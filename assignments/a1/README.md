@@ -27,7 +27,7 @@ Use p/P to pause.<br />
 Use q/Q to quit the game.<br />
 
 ## The enhancements:<br />
-Creative level design. A classic level is a bounded square region with no obstacles inside. You can enhance this by adding obstacles that the snake must avoid and gaps on the border that lets the snake wrap around to other side of the screen.(10 marks): <br />
+Creative level design. A classic level is a bounded square region with no obstacles inside. You can enhance this by adding obstacles that the snake must avoid and gaps on the border that lets the snake wrap around to other side of the screen: <br />
 Add obstacles.<br />
 Add gaps on the border that lets the snake wrap around to other side of the screen.<br />
 
