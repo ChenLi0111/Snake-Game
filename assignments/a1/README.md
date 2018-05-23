@@ -12,11 +12,11 @@ Or use "make" to compile snake.cpp, and use "./snake" to run the game.<br />
 
 ## Command-line parameters:<br />
 "./snake xx"<br />
-Use 1 parameter to input frame-rate(in range of [25, 60]), default game speed is 5.<br />
+Use 1 parameter to input frame-rate(in range of [1, 100]), and the default game speed is 5.<br />
 
 "./snake xx xx"<br />
 Use 2 parameters to input frame-rate and game speed.<br />
-First one should be frame-rate(in range of [25, 60]).<br />
+First one should be frame-rate(in range of [1, 100]).<br />
 Second one should be game speed(in range of [1, 10]).<br />
 
 ## The controls:<br />

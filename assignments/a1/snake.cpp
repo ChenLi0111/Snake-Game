@@ -68,6 +68,14 @@ void error(string str) {
 	cerr << str << endl;
 	exit(0);
 }
+
+// get microseconds
+unsigned long now() {
+	timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec * 1000000 + tv.tv_usec;
+}
+
 /* exit:
 (0, 260) left
 (790, 360) right
@@ -227,7 +235,6 @@ class Snake : public Displayable {
 				block_list.clear();
 				dir = 0;
 				receive = 0;
-				wait = 0;
 				edge_gap = false;
 				received_turn = false;
 				int xx_1 = 100;
@@ -241,6 +248,7 @@ class Snake : public Displayable {
 				block_list.push_back(make_pair(xx_3, yy_3));
 				hit_pause = 0;
 				press_restart_snake = false;
+				last_move_time = now();
 			}
 			for (vector<pair<int, int> >::iterator it = block_list.begin(); it != block_list.end(); ++it) {
 				XFillRectangle(xinfo.display, xinfo.window, xinfo.gc[0], (*it).first, (*it).second, 10, blockSize);
@@ -259,25 +267,21 @@ class Snake : public Displayable {
 
 		void update_list() {
 			for (vector<pair<int, int> >::reverse_iterator it = block_list.rbegin(); it != block_list.rend() - 1; ++it) {
-						(*it).first = (*(it + 1)).first;
-						(*it).second = (*(it + 1)).second;
+				(*it).first = (*(it + 1)).first;
+				(*it).second = (*(it + 1)).second;
 			}
 		}
 		
 		void move(XInfo &xinfo) {
-			if ((hit_pause != 0 && (hit_pause % 2)) || (end_game == true) || (start_game == true)) {return;}
+			if ((hit_pause != 0 && (hit_pause % 2)) ||
+				(end_game == true) ||
+				(start_game == true) ||
+				(should_repaint() == false)) {return;}
 			if (received_turn != true) {trun();}
-
-			if (wait < 10 - speed) {
-				wait++;
-				return;
-			} else {
-				if (didHitObstacle(dir)) {return;}
-				didEatFruit(dir);
-				wait = 0;
-			}
+			if (didHitObstacle(dir)) {return;}
+			didEatFruit(dir);
 			received_turn = false;
-			//cerr << block_list.front().first << " " << block_list.front().second << endl;
+			last_move_time = now();
 		}
 
 		bool check_regenerate() {
@@ -459,7 +463,6 @@ class Snake : public Displayable {
 
 		Snake(int dir, int receive): dir(dir), receive(receive) {
 			blockSize = 10;
-			wait = 0;
 			received_turn = false;
 			edge_gap = false;
 			int x_1 = 100;
@@ -468,24 +471,33 @@ class Snake : public Displayable {
 			int y_1 = 260;
 			int y_2 = 260;
 			int y_3 = 260;
+			last_move_time = 0;
 			block_list.push_back(make_pair(x_1, y_1));
 			block_list.push_back(make_pair(x_2, y_2));
 			block_list.push_back(make_pair(x_3, y_3));
 		}
 
 		void change_keyboard(int re) {
-			if (start_game == true) {return;}
+			if (start_game == true || (hit_pause != 0 && (hit_pause % 2))) {return;}
 			receive = re;
+		}
+
+		bool should_repaint() {
+			unsigned long stay = 1000000 / speed;
+			if (now() - last_move_time < stay) {
+				return false;
+			}
+			return true;
 		}
 
 	private:
 		int blockSize;
 		int dir; // 0 right; 1 down; 2 left; 3 up
 		int receive; // 0 d; 1 s; 2 a; 3 w
-		int wait;
 		bool received_turn;
 		bool edge_gap;
 		std::vector< pair<int, int> > block_list;
+		unsigned long last_move_time;
 };
 
 class Edge : public Displayable {
@@ -588,13 +600,15 @@ Text text_line(25, 35);
  */
 void initX(int argc, char *argv[], XInfo &xInfo) {
 	//command line input
-	if (argc == 2 && atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60){
+	if (argc == 2 && atoi(argv[1]) >= 1 && atoi(argv[1]) <= 100){
 		FPS = atoi(argv[1]);
 		text_line.set_print_FPS(atoi(argv[1]));
 	}
-	if (argc == 3 && atoi(argv[1]) >= 25 && atoi(argv[1]) <= 60) {
-		FPS = atoi(argv[1]);
-		text_line.set_print_FPS(atoi(argv[1]));
+	if (argc == 3) {
+		if (atoi(argv[1]) >= 1 && atoi(argv[1]) <= 100) {
+			FPS = atoi(argv[1]);
+			text_line.set_print_FPS(atoi(argv[1]));
+		}
 		if (atoi(argv[2]) >= 1 && atoi(argv[2]) <= 10) {
 			speed = atoi(argv[2]);
 			text_line.set_print_direction(atoi(argv[2]));
@@ -765,8 +779,10 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 				break;
 			case 'k':
 			case 'K':
+				if (start_game == true) {
+					hit_pause = 0;
+				}
 				start_game = false;
-				hit_pause = 0;
 				break;
 		}
 	}
@@ -788,13 +804,6 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 
 void handleAnimation(XInfo &xinfo, int inside) {
 	snake.move(xinfo);
-}
-
-// get microseconds
-unsigned long now() {
-	timeval tv;
-	gettimeofday(&tv, NULL);
-	return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
 void eventLoop(XInfo &xinfo) {
