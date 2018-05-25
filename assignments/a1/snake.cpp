@@ -701,6 +701,8 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	 */
 	XMapRaised( xInfo.display, xInfo.window );
 	XFlush(xInfo.display);
+	int temp = XFreeFont(xInfo.display, font);
+	int temp2 = XFreeFont(xInfo.display, font_2);
 }
 
 /*
