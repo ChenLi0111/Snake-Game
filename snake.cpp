@@ -159,7 +159,7 @@ class Start_Display : public Displayable {
 		}
 
 	    Start_Display() {
-			s_1 = "First name: Chen, Last name: Li, student ID: 20597755.";
+			s_1 = "Author: Chen Li";
 			s_2 = "Welcome to this snake game.";
 			s_3 = "Control the snake to eat fruits and avoid obstacles";
 			s_4 = " and its own body.";
