@@ -1,16 +1,8 @@
-/*
-CS 349 A1 Skeleton Code - Snake
-
-- - - - - - - - - - - - - - - - - - - - - -
-
-Commands to compile and run:
-
-    g++ -o snake snake.cpp -L/usr/X11R6/lib -lX11 -lstdc++
-    ./snake
-
-Note: the -L option and -lstdc++ may not be needed on some machines.
+/* 
+*  Commands to compile and run:
+*  g++ -o snake snake.cpp -L/usr/X11R6/lib -lX11 -lstdc++; ./snake
+*  Note: the -L option and -lstdc++ may not be needed on some machines.
 */
-
 #include <iostream>
 #include <list>
 #include <cstdlib>
@@ -22,17 +14,13 @@ Note: the -L option and -lstdc++ may not be needed on some machines.
 #include <sstream>
 #include <vector>
 
-/*
- * Header files for X functions
- */
+// Header files for X functions
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <unistd.h> // needed for sleep
 using namespace std;
  
-/*
- * Global game state variables
- */
+// Global game state variables
 const int Border = 1;
 const int BufferSize = 10;
 int FPS = 30;
@@ -49,9 +37,7 @@ bool press_restart_score = false;
 bool start_game = true;
 bool end_game = false;
 
-/*
- * Information to draw on the window.
- */
+// Information to draw on the window
 struct XInfo {
 	Display *display;
 	int screen;
@@ -61,9 +47,7 @@ struct XInfo {
 	int height;
 };
 
-/*
- * Function to put out a message on error exits.
- */
+// Function to put out a message on error exits
 void error(string str) {
 	cerr << str << endl;
 	exit(0);
@@ -76,7 +60,8 @@ unsigned long now() {
 	return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
-/* exit:
+/* 
+exit:
 (0, 260) left
 (790, 360) right
 (600, 590) down
@@ -92,11 +77,10 @@ y [260, 300]
 
 right:
 x [660, 730]
-y [100, 140]*/
+y [100, 140]
+*/
 
-/*
- * An abstract class representing displayable things. 
- */
+// An abstract class representing displayable things
 class Displayable {
 	public:
 		virtual void paint(XInfo &xinfo) = 0;
@@ -595,9 +579,7 @@ Snake snake(0, 0);
 Edge edge;
 Text text_line(25, 35);
 
-/*
- * Initialize X and create a window
- */
+// Initialize X and create a window
 void initX(int argc, char *argv[], XInfo &xInfo) {
 	//command line input
 	if (argc == 2 && atoi(argv[1]) >= 1 && atoi(argv[1]) <= 100){
@@ -618,18 +600,14 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 	XSizeHints hints;
 	unsigned long white, black;
 
-   /*
-	* Display opening uses the DISPLAY	environment variable.
-	* It can go wrong if DISPLAY isn't set, or you don't have permission.
-	*/	
+	// Display opening uses the DISPLAY	environment variable.
+	// It can go wrong if DISPLAY isn't set, or you don't have permission.
 	xInfo.display = XOpenDisplay("");
 	if (!xInfo.display) {
 		error("Can't open display.");
 	}
 	
-   /*
-	* Find out some things about the display you're using.
-	*/
+	// Find out some things about the display you're using.
 	xInfo.screen = DefaultScreen( xInfo.display );
 
 	white = XWhitePixel( xInfo.display, xInfo.screen );
@@ -659,9 +637,7 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 		argv, argc, // applications command line args
 		&hints); // size hints for the window
 
-	/* 
-	 * Create Graphics Contexts
-	 */
+	// Create Graphics Contexts
 	int i = 0;
 	xInfo.gc[i] = XCreateGC(xInfo.display, xInfo.window, 0, 0);
 	XSetForeground(xInfo.display, xInfo.gc[i], BlackPixel(xInfo.display, xInfo.screen));
@@ -696,18 +672,14 @@ void initX(int argc, char *argv[], XInfo &xInfo) {
 		EnterWindowMask | LeaveWindowMask |
 		StructureNotifyMask);  // for resize events
 
-	/*
-	 * Put the window on the screen.
-	 */
+	// Put the window on the screen
 	XMapRaised( xInfo.display, xInfo.window );
 	XFlush(xInfo.display);
 	int temp = XFreeFont(xInfo.display, font);
 	int temp2 = XFreeFont(xInfo.display, font_2);
 }
 
-/*
- * Function to repaint a display list
- */
+// Function to repaint a display list
 void repaint(XInfo &xinfo) {
 	list<Displayable *>::const_iterator begin = dList.begin();
 	list<Displayable *>::const_iterator end = dList.end();
@@ -736,10 +708,9 @@ void handleKeyPress(XInfo &xinfo, XEvent &event) {
 	KeySym key;
 	char text[BufferSize];
 	
-	/*
-	 * Exit when 'q' is typed.
-	 * This is a simplified approach that does NOT use localization.
-	 */
+	// Exit when 'q' is typed.
+	// This is a simplified approach that does NOT use localization.
+
 	int i = XLookupString( 
 		(XKeyEvent *)&event, // the keyboard event
 		text, // buffer when text will be written
@@ -852,12 +823,10 @@ void eventLoop(XInfo &xinfo) {
 	}
 }
 
-/*
- * Start executing here.
- *	 First initialize window.
- *	 Next loop responding to events.
- *	 Exit forcing window manager to clean up - cheesy, but easy.
- */
+// Start executing here.
+// First initialize window.
+// Next loop responding to events.
+// Exit forcing window manager to clean up - cheesy, but easy.
 int main (int argc, char *argv[]) {
 	XInfo xInfo;
 	initX(argc, argv, xInfo);
