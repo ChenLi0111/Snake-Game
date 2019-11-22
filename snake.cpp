@@ -6,9 +6,9 @@ using namespace std;
  
 // Global game state variables
 const static int Border = 1;
-const static int BufferSize = 10;
 const static int width = 800;
 const static int height = 600;
+const static int buffer_size = 10;
 
 // Function to put out a message on error exits
 void error(string str) {
@@ -118,19 +118,16 @@ void repaint(XInfo * xinfo, vector<Displayable *> displayable_vector) {
 	XFlush( xinfo->display );
 }
 
-void handle_key_press(XInfo * xinfo, XEvent * event, vector<Displayable *> displayable_vector) {
-	cerr << "check segmentation fault 1" << endl;
+void handle_key_press(XInfo * xinfo, XEvent event, vector<Displayable *> displayable_vector) {
 	KeySym key;
-	char text[BufferSize];
+	char text[buffer_size];
 
 	int i = XLookupString( 
-		(XKeyEvent *) event, // the keyboard event
+		(XKeyEvent *) &event, // the keyboard event
 		text, // buffer when text will be written
-		BufferSize, // size of the text buffer
+		buffer_size, // size of the text buffer
 		&key, // workstation-independent key symbol
 		NULL); // pointer to a composeStatus structure (unused)
-
-	cerr << "check segmentation fault 2" << endl;
 
 	if (i == 1) {
 		printf("Got key press -- %c\n", text[0]);
@@ -192,15 +189,15 @@ void handle_key_press(XInfo * xinfo, XEvent * event, vector<Displayable *> displ
 }
 
 void event_loop(XInfo * xinfo, vector<Displayable *> displayable_vector) {
-	XEvent * event;
+	XEvent event;
 	unsigned long lastRepaint = 0;
 	int inside = 0;
 
 	while(true) {
 		if (XPending(xinfo->display) > 0) {
-			XNextEvent(xinfo->display, event);
+			XNextEvent(xinfo->display, &event);
 			//cerr << "event->type = " << event->type << endl;
-			switch(event->type) {
+			switch(event.type) {
 				case KeyPress:
 					handle_key_press(xinfo, event, displayable_vector);
 					break;
